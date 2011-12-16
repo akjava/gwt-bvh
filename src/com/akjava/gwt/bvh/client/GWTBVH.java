@@ -1,6 +1,22 @@
 package com.akjava.gwt.bvh.client;
 
 
+/*
+ * Copyright (C) 2011 aki@akjava.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -104,6 +120,7 @@ public class GWTBVH extends SimpleDemoEntryPoint {
 	}
 	
 
+	private int defaultZ=200;
 	Map<String,Vector3> boneSizeMap=new HashMap<String,Vector3>();
 	@Override
 	public void initializeOthers(WebGLRenderer renderer) {
@@ -118,7 +135,7 @@ public class GWTBVH extends SimpleDemoEntryPoint {
 		pointLight.setPosition(0, 10, 300);
 		scene.add(pointLight);
 		
-		doLoad("80_70");
+		doLoad("80_72");
 		
 		Geometry geo=THREE.PlaneGeometry(50, 50);
 		Mesh mesh=THREE.Mesh(geo, THREE.MeshBasicMaterial().color(0x666666).wireFrame(false).build());
@@ -302,7 +319,7 @@ public class GWTBVH extends SimpleDemoEntryPoint {
 
 	private Label loadingLabel=new Label();
 	private CheckBox translatePosition;
-	private HTML5InputRange YPosition;
+	private HTML5InputRange positionYRange;
 	private HTML5InputRange meshScaleX;
 	private HTML5InputRange meshScaleY;
 	private HTML5InputRange meshScaleZ;
@@ -311,6 +328,7 @@ public class GWTBVH extends SimpleDemoEntryPoint {
 	private HTML5InputRange positionZ;
 	private PopupPanel bottomPanel;
 	protected boolean playing;
+	private HTML5InputRange positionXRange;
 
 	private void loadBVH(String path){
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(path));
@@ -324,7 +342,7 @@ public class GWTBVH extends SimpleDemoEntryPoint {
 						String bvhText=response.getText();
 						//useless spend allmost time with request and spliting.
 						parseBVH(bvhText);
-						
+						loadingLabel.setText("");
 					}
 					
 					
@@ -360,6 +378,7 @@ public void onError(Request request, Throwable exception) {
 				poseIndex=1;
 			}
 			
+			clock.update();
 			updatePoseIndex(poseIndex);
 			doPose(bvh,bvh.getMotion().getMotions().get(poseIndex));
 			currentFrameRange.setMax(bvh.getMotion().getFrames()-1);
@@ -497,40 +516,6 @@ Timer timer=new Timer(){
 		
 		parent.add(loadingLabel);
 		
-		final ListBox list=new ListBox();
-		//parent.add(list);
-		/*
-		list.addItem("12_01");
-		list.addItem("12_02");
-		list.addItem("12_03");
-		list.addItem("13_01");
-		list.addItem("13_02");
-		list.addItem("13_03");
-		list.addItem("13_04");
-		list.addItem("13_05");
-		list.addItem("13_06");
-		list.addItem("13_07");
-		list.addItem("13_08");
-		list.addItem("13_09");
-		list.addItem("13_10");
-		*/
-		/*
-		for(int i=1;i<=73;i++){
-			String ind=""+i;
-			if(ind.length()<2){
-				ind="0"+ind;
-			}
-			list.addItem("80_"+ind);
-		}*/
-		
-		list.setSelectedIndex(0);
-		list.addChangeHandler(new ChangeHandler() {
-			
-			@Override
-			public void onChange(ChangeEvent event) {
-				doLoad(list.getItemText(list.getSelectedIndex()));
-			}
-		});
 		
 		translatePosition = new CheckBox("Translate Position");
 		parent.add(translatePosition);
@@ -541,31 +526,78 @@ Timer timer=new Timer(){
 		
 		
 		
+		HorizontalPanel h1=new HorizontalPanel();
+		
 		rotationRange = new HTML5InputRange(-180,180,0);
-		parent.add(HTML5Builder.createRangeLabel("X-Rotate", rotationRange));
-		parent.add(rotationRange);
-		Button reset=new Button("zero");
+		parent.add(HTML5Builder.createRangeLabel("X-Rotate:", rotationRange));
+		parent.add(h1);
+		h1.add(rotationRange);
+		Button reset=new Button("Reset");
 		reset.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				rotationRange.setValue(0);
 			}
 		});
-		parent.add(reset);
+		h1.add(reset);
 		
+		HorizontalPanel h2=new HorizontalPanel();
 		
 		rotationYRange = new HTML5InputRange(-180,180,0);
-		parent.add(HTML5Builder.createRangeLabel("Y-Rotate", rotationYRange));
-		parent.add(rotationYRange);
+		parent.add(HTML5Builder.createRangeLabel("Y-Rotate:", rotationYRange));
+		parent.add(h2);
+		h2.add(rotationYRange);
+		Button reset2=new Button("Reset");
+		reset2.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				rotationYRange.setValue(0);
+			}
+		});
+		h2.add(reset2);
 		
 		
+		HorizontalPanel h3=new HorizontalPanel();
 		rotationZRange = new HTML5InputRange(-180,180,0);
-		parent.add(HTML5Builder.createRangeLabel("Z-Rotate", rotationZRange));
-		parent.add(rotationZRange);
+		parent.add(HTML5Builder.createRangeLabel("Z-Rotate:", rotationZRange));
+		parent.add(h3);
+		h3.add(rotationZRange);
+		Button reset3=new Button("Reset");
+		reset3.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				rotationZRange.setValue(0);
+			}
+		});
+		h3.add(reset3);
 		
-		YPosition = new HTML5InputRange(-50,50,0);
-		parent.add(HTML5Builder.createRangeLabel("Y-Position", YPosition));
-		parent.add(YPosition);
+		HorizontalPanel h4=new HorizontalPanel();
+		positionXRange = new HTML5InputRange(-50,50,0);
+		parent.add(HTML5Builder.createRangeLabel("X-Position:", positionXRange));
+		parent.add(h4);
+		h4.add(positionXRange);
+		Button reset4=new Button("Reset");
+		reset4.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				positionXRange.setValue(0);
+			}
+		});
+		h4.add(reset4);
+		
+		HorizontalPanel h5=new HorizontalPanel();
+		positionYRange = new HTML5InputRange(-50,50,0);
+		parent.add(HTML5Builder.createRangeLabel("Y-Position:", positionYRange));
+		parent.add(h5);
+		h5.add(positionYRange);
+		Button reset5=new Button("Reset");
+		reset5.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				positionYRange.setValue(0);
+			}
+		});
+		h5.add(reset5);
 		
 		FileUpload file=new FileUpload();
 		file.addChangeHandler(new ChangeHandler() {
@@ -591,7 +623,7 @@ Timer timer=new Timer(){
 		parent.add(file);
 		
 		
-		
+		/*
 		meshScaleX = new HTML5InputRange(0,150,3);
 		parent.add(HTML5Builder.createRangeLabel("Scale-x", meshScaleX));
 		parent.add(meshScaleX);
@@ -615,6 +647,7 @@ Timer timer=new Timer(){
 		positionZ = new HTML5InputRange(-150,150,0);
 		parent.add(HTML5Builder.createRangeLabel("Position-z", positionZ));
 		parent.add(positionZ);
+		*/
 		
 		createBottomPanel();
 	}
@@ -649,6 +682,7 @@ Timer timer=new Timer(){
 	Clock clock=new Clock();
 	@Override
 	protected void beforeUpdate(WebGLRenderer renderer) {
+		/*
 		if(selectedObject!=null){
 			double sx=(double)meshScaleX.getValue()/10;
 			double sy=(double)meshScaleY.getValue()/10;
@@ -659,9 +693,10 @@ Timer timer=new Timer(){
 			selectedObject.setScale(sx, sy, sz);
 			selectedObject.setPosition(px,py,pz);
 		}
+		*/
 		
-		
-		cameraY=YPosition.getValue();
+		cameraY=positionYRange.getValue();
+		cameraX=positionXRange.getValue();
 		if(root!=null){
 		root.getRotation().set(Math.toRadians(rotationRange.getValue()),Math.toRadians(rotationYRange.getValue()),Math.toRadians(rotationZRange.getValue()));
 		}
