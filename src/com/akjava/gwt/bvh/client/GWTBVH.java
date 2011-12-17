@@ -599,6 +599,7 @@ Timer timer=new Timer(){
 		});
 		h5.add(reset5);
 		
+		parent.add(new Label("Load BVH File"));
 		FileUpload file=new FileUpload();
 		file.addChangeHandler(new ChangeHandler() {
 			
@@ -650,6 +651,7 @@ Timer timer=new Timer(){
 		*/
 		
 		createBottomPanel();
+		showControl();
 	}
 
 	protected void doLoad(String itemText) {
@@ -732,5 +734,8 @@ Timer timer=new Timer(){
 		super.resized(width, height);
 		leftBottom(bottomPanel);
 	}
-
+	@Override
+	public String getHtml(){
+		return super.getHtml()+" Sample BVH File from <a href='https://sites.google.com/a/cgspeed.com/cgspeed/motion-capture/cmu-bvh-conversion'>CMU Graphics Lab Motion Capture Database</a>";
+	}
 }
