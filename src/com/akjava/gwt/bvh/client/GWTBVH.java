@@ -24,7 +24,7 @@ import java.util.Map;
 import com.akjava.bvh.client.BVH;
 import com.akjava.bvh.client.BVHNode;
 import com.akjava.bvh.client.BVHParser;
-import com.akjava.bvh.client.BVHParser.InvalidLineException;
+import com.akjava.bvh.client.BVHParser.ParserListener;
 import com.akjava.bvh.client.Channels;
 import com.akjava.bvh.client.NameAndChannel;
 import com.akjava.bvh.client.Vec3;
@@ -34,6 +34,7 @@ import com.akjava.gwt.html5.client.file.File;
 import com.akjava.gwt.html5.client.file.FileHandler;
 import com.akjava.gwt.html5.client.file.FileReader;
 import com.akjava.gwt.html5.client.file.FileUtils;
+import com.akjava.gwt.lib.client.widget.cell.util.Benchmark;
 import com.akjava.gwt.three.client.THREE;
 import com.akjava.gwt.three.client.core.Geometry;
 import com.akjava.gwt.three.client.core.Intersect;
@@ -66,7 +67,6 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PopupPanel;
 
@@ -331,6 +331,7 @@ public class GWTBVH extends SimpleDemoEntryPoint {
 	private HTML5InputRange positionXRange;
 
 	private void loadBVH(String path){
+		Benchmark.start("load");
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(path));
 		loadingLabel.setText("loading-data");
 			try {
@@ -338,8 +339,9 @@ public class GWTBVH extends SimpleDemoEntryPoint {
 					
 					@Override
 					public void onResponseReceived(Request request, Response response) {
-
+						
 						String bvhText=response.getText();
+						log("loaded:"+Benchmark.end("load"));
 						//useless spend allmost time with request and spliting.
 						parseBVH(bvhText);
 						loadingLabel.setText("");
@@ -362,6 +364,7 @@ public void onError(Request request, Throwable exception) {
 	private void parseBVH(String bvhText){
 		final BVHParser parser=new BVHParser();
 		jointMap=new HashMap<String,Object3D>();
+		/*
 		try {
 			bvh=parser.parse(bvhText);
 			BVHNode node=bvh.getHiearchy();
@@ -385,7 +388,38 @@ public void onError(Request request, Throwable exception) {
 			
 		} catch (InvalidLineException e) {
 			log(e.getMessage());
-		}
+		}*/
+		
+		parser.parseAsync(bvhText, new ParserListener() {
+			
+			@Override
+			public void onSuccess(BVH bv) {
+				bvh=bv;
+				BVHNode node=bvh.getHiearchy();
+				
+				if(root!=null){
+					scene.remove(root);
+				}
+				root=THREE.Object3D();
+				scene.add(root);
+				doLog(root,node);
+				
+				int poseIndex=0;
+				if(ignoreFirst.getValue()){
+					poseIndex=1;
+				}
+				
+				clock.update();
+				updatePoseIndex(poseIndex);
+				doPose(bvh,bvh.getMotion().getMotions().get(poseIndex));
+				currentFrameRange.setMax(bvh.getMotion().getFrames()-1);
+			}
+			
+			@Override
+			public void onFaild(String message) {
+				log(message);
+			}
+		});
 	}
 	
 	/* timer style
@@ -605,6 +639,7 @@ Timer timer=new Timer(){
 			
 			@Override
 			public void onChange(ChangeEvent event) {
+				//Benchmark.start("load");
 				JsArray<File> files=FileUtils.toFile(event.getNativeEvent());
 				GWT.log(files.get(0).getFileName());
 				GWT.log(files.get(0).getFileType());
@@ -614,6 +649,7 @@ Timer timer=new Timer(){
 				reader.setOnLoad(new FileHandler() {
 					@Override
 					public void onLoad() {
+						//log("load:"+Benchmark.end("load"));
 						//GWT.log(reader.getResultAsString());
 						parseBVH(reader.getResultAsString());
 					}

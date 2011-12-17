@@ -19,6 +19,13 @@ package com.akjava.bvh.client;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.akjava.gwt.lib.client.ASyncLineSplitter;
+import com.akjava.gwt.lib.client.ASyncLineSplitter.SplitterListener;
+import com.akjava.gwt.lib.client.LogUtils;
+import com.akjava.gwt.lib.client.widget.cell.util.Benchmark;
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
+
 
 public class BVHParser {
 
@@ -41,15 +48,44 @@ public class BVHParser {
 	
 	
 	
+	public static interface ParserListener {
+		public void onSuccess(BVH bvh);
+		public void onFaild(String message);
+	}
+	
+	public  void parseAsync(String text,final ParserListener listener){
+		initialize();
+		final String replaced=text.replace("\r", "");
+		
+		Benchmark.start("split");
+		ASyncLineSplitter splitter=new ASyncLineSplitter(replaced,10,new SplitterListener() {
+			@Override
+			public void onSuccess(List<String> lines) {
+				LogUtils.log("splited:"+Benchmark.end("split"));
+				try {
+					parseLines(lines.toArray(new String[lines.size()]));
+				} catch (InvalidLineException e) {
+					listener.onFaild(e.getMessage());
+				}
+				//LogUtils.log("parsed:"+Benchmark.end("parse"));
+				validate();
+				listener.onSuccess(bvh);
+			}
+		});
+		
+		
+		Scheduler.get().scheduleEntry(splitter);
+	}
+	
 	public  BVH parse(String text) throws InvalidLineException{
 		initialize();
+		Benchmark.start("split");
 		text=text.replace("\r", "");
 		String lines[]=text.split("\n");
+		LogUtils.log("splited:"+Benchmark.end("load"));
 		parseLines(lines);
 		
 		validate();
-		//throw new InvalidLineException(-1,"", "getFrames:"+bvh.getMotion().getFrames() +" and motions is difference "+bvh.getMotion().getMotions().size());
-		
 		return bvh;
 	}
 		
