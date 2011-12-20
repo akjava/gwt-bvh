@@ -31,10 +31,13 @@ import com.akjava.bvh.client.NameAndChannel;
 import com.akjava.bvh.client.Vec3;
 import com.akjava.gwt.bvh.client.list.BVHFileWidget;
 import com.akjava.gwt.bvh.client.list.DataList;
+import com.akjava.gwt.bvh.client.list.DataList.ChangeSelectionListener;
 import com.akjava.gwt.bvh.client.list.DataList.DataListRenderer;
 import com.akjava.gwt.html5.client.HTML5InputRange;
 import com.akjava.gwt.html5.client.extra.HTML5Builder;
 import com.akjava.gwt.html5.client.file.File;
+import com.akjava.gwt.html5.client.file.FileHandler;
+import com.akjava.gwt.html5.client.file.FileReader;
 import com.akjava.gwt.html5.client.file.FileUtils;
 import com.akjava.gwt.lib.client.widget.cell.util.Benchmark;
 import com.akjava.gwt.three.client.THREE;
@@ -45,6 +48,7 @@ import com.akjava.gwt.three.client.core.Object3D;
 import com.akjava.gwt.three.client.core.Projector;
 import com.akjava.gwt.three.client.core.Vector3;
 import com.akjava.gwt.three.client.gwt.Clock;
+import com.akjava.gwt.three.client.gwt.Object3DUtils;
 import com.akjava.gwt.three.client.gwt.SimpleDemoEntryPoint;
 import com.akjava.gwt.three.client.lights.Light;
 import com.akjava.gwt.three.client.objects.Mesh;
@@ -64,7 +68,6 @@ import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
-import com.google.gwt.user.cellview.client.CellList;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FileUpload;
@@ -73,7 +76,6 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.SingleSelectionModel;
 
 
 /**
@@ -126,10 +128,13 @@ public class GWTBVH extends SimpleDemoEntryPoint {
 	
 
 	private int defaultZ=200;
+	
 	Map<String,Vector3> boneSizeMap=new HashMap<String,Vector3>();
+
+	private Object3D rootGroup,boneContainer,backgroundContainer;
 	@Override
 	public void initializeOthers(WebGLRenderer renderer) {
-		cameraY=10;
+		cameraY=0;
 		defaultZoom=5;
 		canvas.setClearColorHex(0xcccccc);
 		
@@ -142,11 +147,20 @@ public class GWTBVH extends SimpleDemoEntryPoint {
 		
 		doLoad("80_72");
 		
-		Geometry geo=THREE.PlaneGeometry(50, 50);
-		Mesh mesh=THREE.Mesh(geo, THREE.MeshBasicMaterial().color(0x666666).wireFrame(false).build());
-		mesh.setPosition(0, 0, -50);
-		mesh.setRotation(Math.toRadians(90), 0, 0);
-		//scene.add(mesh);
+		rootGroup=THREE.Object3D();
+		scene.add(rootGroup);
+		
+		backgroundContainer=THREE.Object3D();
+		rootGroup.add(backgroundContainer);
+		
+		Geometry geo=THREE.PlaneGeometry(100, 100,20,20);
+		Mesh mesh=THREE.Mesh(geo, THREE.MeshBasicMaterial().color(0x666666).wireFrame(true).build());
+		mesh.setPosition(0, -17, 0);
+		mesh.setRotation(Math.toRadians(-90), 0, 0);
+		backgroundContainer.add(mesh);
+		
+		boneContainer=THREE.Object3D();
+		rootGroup.add(boneContainer);
 		/*
 		BVHParser parser=new BVHParser();
 		//String singleBvh=Bundles.INSTANCE.single_basic().getText();
@@ -335,6 +349,10 @@ public class GWTBVH extends SimpleDemoEntryPoint {
 	protected boolean playing;
 	private HTML5InputRange positionXRange;
 
+	private HTML5InputRange positionZRange;
+
+	private CheckBox drawBackground;
+
 	private void loadBVH(String path){
 		Benchmark.start("load");
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(path));
@@ -369,31 +387,6 @@ public void onError(Request request, Throwable exception) {
 	private void parseBVH(String bvhText){
 		final BVHParser parser=new BVHParser();
 		jointMap=new HashMap<String,Object3D>();
-		/*
-		try {
-			bvh=parser.parse(bvhText);
-			BVHNode node=bvh.getHiearchy();
-			
-			if(root!=null){
-				scene.remove(root);
-			}
-			root=THREE.Object3D();
-			scene.add(root);
-			doLog(root,node);
-			
-			int poseIndex=0;
-			if(ignoreFirst.getValue()){
-				poseIndex=1;
-			}
-			
-			clock.update();
-			updatePoseIndex(poseIndex);
-			doPose(bvh,bvh.getMotion().getMotions().get(poseIndex));
-			currentFrameRange.setMax(bvh.getMotion().getFrames()-1);
-			
-		} catch (InvalidLineException e) {
-			log(e.getMessage());
-		}*/
 		
 		parser.parseAsync(bvhText, new ParserListener() {
 			
@@ -402,12 +395,12 @@ public void onError(Request request, Throwable exception) {
 				bvh=bv;
 				BVHNode node=bvh.getHiearchy();
 				
-				if(root!=null){
-					scene.remove(root);
+				if(boneRoot!=null){
+					boneContainer.remove(boneRoot);
 				}
-				root=THREE.Object3D();
-				scene.add(root);
-				doLog(root,node);
+				boneRoot=THREE.Object3D();
+				boneContainer.add(boneRoot);
+				doLog(boneRoot,node);
 				
 				int poseIndex=0;
 				if(ignoreFirst.getValue()){
@@ -556,10 +549,14 @@ Timer timer=new Timer(){
 		parent.add(loadingLabel);
 		
 		
+		drawBackground = new CheckBox("Draw Background");
+		parent.add(drawBackground);
+		drawBackground.setValue(true);
+		
 		translatePosition = new CheckBox("Translate Position");
 		parent.add(translatePosition);
 		
-		ignoreFirst = new CheckBox("ignore First(Pose Frame)");
+		ignoreFirst = new CheckBox("Ignore First Frame(Usually Pose)");
 		ignoreFirst.setValue(true);
 		parent.add(ignoreFirst);
 		
@@ -638,6 +635,20 @@ Timer timer=new Timer(){
 		});
 		h5.add(reset5);
 		
+		HorizontalPanel h6=new HorizontalPanel();
+		positionZRange = new HTML5InputRange(-50,50,0);
+		parent.add(HTML5Builder.createRangeLabel("Z-Position:", positionZRange));
+		parent.add(h6);
+		h6.add(positionZRange);
+		Button reset6=new Button("Reset");
+		reset6.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				positionZRange.setValue(0);
+			}
+		});
+		h6.add(reset6);
+		
 		parent.add(new Label("Load BVH File"));
 		FileUpload file=new FileUpload();
 		
@@ -692,13 +703,13 @@ Timer timer=new Timer(){
 				if(bvhFileList.size()==0){
 					return;
 				}
-				File file=fileSelectionModel.getSelectedObject();
+				File file=dataList.getSelection();
 				int index=bvhFileList.indexOf(file);
 				index--;
 				if(index<0){
 					index=bvhFileList.size()-1;
 				}
-				fileSelectionModel.setSelected(bvhFileList.get(index), true);
+				dataList.setSelection(bvhFileList.get(index));
 			}
 		});
 		fileControl.add(prevBt);
@@ -711,13 +722,13 @@ Timer timer=new Timer(){
 				if(bvhFileList.size()==0){
 					return;
 				}
-				File file=fileSelectionModel.getSelectedObject();
+				File file=dataList.getSelection();
 				int index=bvhFileList.indexOf(file);
 				index++;
 				if(index>bvhFileList.size()-1){
 					index=0;
 				}
-				fileSelectionModel.setSelected(bvhFileList.get(index), true);
+				dataList.setSelection(bvhFileList.get(index));
 			}
 		});
 		fileControl.add(nextBt);
@@ -752,12 +763,25 @@ Timer timer=new Timer(){
 		
 		dataList = new DataList<File>(new DataListRenderer<File>(){
 			@Override
-			public Widget createWidget(File data) {
+			public Widget createWidget(File data,DataList<File> dataList) {
 				// TODO Auto-generated method stub
-				return new BVHFileWidget(data);
+				return new BVHFileWidget(data,dataList);
 			}});
 		dataList.setHeight("100px");
 		parent.add(dataList);
+		dataList.setListener(new ChangeSelectionListener<File>() {
+			@Override
+			public void onChangeSelection(File data) {
+				final FileReader reader=FileReader.createFileReader();
+				reader.setOnLoad(new FileHandler() {
+					@Override
+					public void onLoad() {
+						parseBVH(reader.getResultAsString());
+					}
+				});
+				reader.readAsText(data,"utf-8");
+			}
+		});
 		
 		createBottomPanel();
 		showControl();
@@ -772,7 +796,7 @@ Timer timer=new Timer(){
 	private HTML5InputRange rotationYRange;
 	private HTML5InputRange rotationZRange;
 
-	Object3D root;
+	Object3D boneRoot;
 	
 	
 	private BVH bvh;
@@ -793,7 +817,7 @@ Timer timer=new Timer(){
 	Clock clock=new Clock();
 	private List<File> bvhFileList=new ArrayList<File>();
 	//private CellList<File> bvhCellList;
-	private SingleSelectionModel<File> fileSelectionModel;
+	//private SingleSelectionModel<File> fileSelectionModel;
 	private DataList<File> dataList;
 	@Override
 	protected void beforeUpdate(WebGLRenderer renderer) {
@@ -809,11 +833,19 @@ Timer timer=new Timer(){
 			selectedObject.setPosition(px,py,pz);
 		}
 		*/
+		//camera.getPosition().setY(cameraY);
+		//camera.getPosition().setY(cameraX);//MOVE UP?
 		
-		cameraY=positionYRange.getValue();
-		cameraX=positionXRange.getValue();
-		if(root!=null){
-		root.getRotation().set(Math.toRadians(rotationRange.getValue()),Math.toRadians(rotationYRange.getValue()),Math.toRadians(rotationZRange.getValue()));
+		//cameraY=positionYRange.getValue();
+		//cameraX=positionXRange.getValue();
+		
+		Object3DUtils.setVisibleAll(backgroundContainer, drawBackground.getValue());
+		//backgroundContainer.setVisible();
+		
+		boneContainer.setPosition(positionXRange.getValue(), positionYRange.getValue(), positionZRange.getValue());
+		
+		if(boneRoot!=null){
+		rootGroup.getRotation().set(Math.toRadians(rotationRange.getValue()),Math.toRadians(rotationYRange.getValue()),Math.toRadians(rotationZRange.getValue()));
 		}
 		
 		if(bvh!=null){
