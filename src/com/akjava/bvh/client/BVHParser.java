@@ -19,8 +19,8 @@ package com.akjava.bvh.client;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.akjava.gwt.lib.client.ASyncLineSplitter;
-import com.akjava.gwt.lib.client.ASyncLineSplitter.SplitterListener;
+import com.akjava.gwt.lib.client.LineSplitter;
+import com.akjava.gwt.lib.client.LineSplitter.SplitterListener;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.lib.client.widget.cell.util.Benchmark;
 import com.google.gwt.core.client.Scheduler;
@@ -58,7 +58,7 @@ public class BVHParser {
 		final String replaced=text.replace("\r", "");
 		
 		Benchmark.start("split");
-		ASyncLineSplitter splitter=new ASyncLineSplitter(replaced,10,new SplitterListener() {
+		LineSplitter splitter=new LineSplitter(replaced,10,new SplitterListener() {
 			@Override
 			public void onSuccess(List<String> lines) {
 				LogUtils.log("splited:"+Benchmark.end("split"));

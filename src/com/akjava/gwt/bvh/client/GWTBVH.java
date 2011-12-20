@@ -17,6 +17,7 @@ package com.akjava.gwt.bvh.client;
  * limitations under the License.
  */
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,11 +29,12 @@ import com.akjava.bvh.client.BVHParser.ParserListener;
 import com.akjava.bvh.client.Channels;
 import com.akjava.bvh.client.NameAndChannel;
 import com.akjava.bvh.client.Vec3;
+import com.akjava.gwt.bvh.client.list.BVHFileWidget;
+import com.akjava.gwt.bvh.client.list.DataList;
+import com.akjava.gwt.bvh.client.list.DataList.DataListRenderer;
 import com.akjava.gwt.html5.client.HTML5InputRange;
 import com.akjava.gwt.html5.client.extra.HTML5Builder;
 import com.akjava.gwt.html5.client.file.File;
-import com.akjava.gwt.html5.client.file.FileHandler;
-import com.akjava.gwt.html5.client.file.FileReader;
 import com.akjava.gwt.html5.client.file.FileUtils;
 import com.akjava.gwt.lib.client.widget.cell.util.Benchmark;
 import com.akjava.gwt.three.client.THREE;
@@ -62,6 +64,7 @@ import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
+import com.google.gwt.user.cellview.client.CellList;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FileUpload;
@@ -69,6 +72,8 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PopupPanel;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.SingleSelectionModel;
 
 
 /**
@@ -635,12 +640,30 @@ Timer timer=new Timer(){
 		
 		parent.add(new Label("Load BVH File"));
 		FileUpload file=new FileUpload();
+		
+		file.setHeight("50px");
+		file.getElement().setAttribute("multiple", "multiple");
 		file.addChangeHandler(new ChangeHandler() {
 			
 			@Override
 			public void onChange(ChangeEvent event) {
 				//Benchmark.start("load");
+				
 				JsArray<File> files=FileUtils.toFile(event.getNativeEvent());
+				
+				for(int i=0;i<files.length();i++){
+					bvhFileList.add(files.get(i));
+				}
+				
+				dataList.setDatas(bvhFileList);
+				dataList.setSelection(files.get(0));
+				//bvhCellList.setRowCount(bvhFileList.size(), true);
+				//bvhCellList.setRowData(bvhFileList);
+				
+				//fileSelectionModel.setSelected(files.get(0), true);
+				
+				/*
+				log("length:"+files.length());
 				GWT.log(files.get(0).getFileName());
 				GWT.log(files.get(0).getFileType());
 				GWT.log(""+files.get(0).getFileSize());
@@ -655,11 +678,51 @@ Timer timer=new Timer(){
 					}
 				});
 				reader.readAsText(files.get(0),"utf-8");
+				*/
 			}
 		});
 		parent.add(file);
+		HorizontalPanel fileControl=new HorizontalPanel();
+		parent.add(fileControl);
+		Button prevBt=new Button("Prev");
+		prevBt.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				if(bvhFileList.size()==0){
+					return;
+				}
+				File file=fileSelectionModel.getSelectedObject();
+				int index=bvhFileList.indexOf(file);
+				index--;
+				if(index<0){
+					index=bvhFileList.size()-1;
+				}
+				fileSelectionModel.setSelected(bvhFileList.get(index), true);
+			}
+		});
+		fileControl.add(prevBt);
 		
+		Button nextBt=new Button("Next");
+		nextBt.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				if(bvhFileList.size()==0){
+					return;
+				}
+				File file=fileSelectionModel.getSelectedObject();
+				int index=bvhFileList.indexOf(file);
+				index++;
+				if(index>bvhFileList.size()-1){
+					index=0;
+				}
+				fileSelectionModel.setSelected(bvhFileList.get(index), true);
+			}
+		});
+		fileControl.add(nextBt);
 		
+		file.setStylePrimaryName("fileborder");
 		/*
 		meshScaleX = new HTML5InputRange(0,150,3);
 		parent.add(HTML5Builder.createRangeLabel("Scale-x", meshScaleX));
@@ -685,6 +748,16 @@ Timer timer=new Timer(){
 		parent.add(HTML5Builder.createRangeLabel("Position-z", positionZ));
 		parent.add(positionZ);
 		*/
+		
+		
+		dataList = new DataList<File>(new DataListRenderer<File>(){
+			@Override
+			public Widget createWidget(File data) {
+				// TODO Auto-generated method stub
+				return new BVHFileWidget(data);
+			}});
+		dataList.setHeight("100px");
+		parent.add(dataList);
 		
 		createBottomPanel();
 		showControl();
@@ -718,6 +791,10 @@ Timer timer=new Timer(){
 	}
 	
 	Clock clock=new Clock();
+	private List<File> bvhFileList=new ArrayList<File>();
+	//private CellList<File> bvhCellList;
+	private SingleSelectionModel<File> fileSelectionModel;
+	private DataList<File> dataList;
 	@Override
 	protected void beforeUpdate(WebGLRenderer renderer) {
 		/*
