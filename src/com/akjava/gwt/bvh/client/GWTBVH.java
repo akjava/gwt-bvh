@@ -60,7 +60,9 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
+import com.google.gwt.event.dom.client.MouseOutEvent;
 import com.google.gwt.event.dom.client.MouseUpEvent;
 import com.google.gwt.event.dom.client.MouseUpHandler;
 import com.google.gwt.http.client.Request;
@@ -127,8 +129,15 @@ public class GWTBVH extends SimpleDemoEntryPoint {
 
 	@Override
 	public void onMouseMove(MouseMoveEvent event) {
-		// TODO Auto-generated method stub
-		
+		if(mouseDown){
+			int diffX=event.getX()-mouseDownX;
+			int diffY=event.getY()-mouseDownY;
+			mouseDownX=event.getX();
+			mouseDownY=event.getY();
+			
+			rotationRange.setValue(rotationRange.getValue()+diffY);
+			rotationYRange.setValue(rotationYRange.getValue()+diffX);
+		}
 	}
 	
 
@@ -1025,23 +1034,10 @@ Timer timer=new Timer(){
 	private CheckBox abLoopCheck;
 	@Override
 	protected void beforeUpdate(WebGLRenderer renderer) {
-		/*
-		if(selectedObject!=null){
-			double sx=(double)meshScaleX.getValue()/10;
-			double sy=(double)meshScaleY.getValue()/10;
-			double sz=(double)meshScaleZ.getValue()/10;
-			double px=(double)positionX.getValue()/10;
-			double py=(double)positionY.getValue()/10;
-			double pz=(double)positionZ.getValue()/10;
-			selectedObject.setScale(sx, sy, sz);
-			selectedObject.setPosition(px,py,pz);
-		}
-		*/
-		//camera.getPosition().setY(cameraY);
-		//camera.getPosition().setY(cameraX);//MOVE UP?
 		
-		//cameraY=positionYRange.getValue();
-		//cameraX=positionXRange.getValue();
+		
+		//camera.getPosition().incrementX((mouseX - camera.getPosition().getX() ) * 0.05);
+		//camera.getPosition().incrementY((-mouseY - camera.getPosition().getY() ) * 0.05);
 		
 		//validate ab-check
 		boolean abLoop=abLoopCheck.getValue();
@@ -1141,4 +1137,8 @@ Timer timer=new Timer(){
 	public String getHtml(){
 		return super.getHtml()+" Sample BVH File from <a href='https://sites.google.com/a/cgspeed.com/cgspeed/motion-capture/cmu-bvh-conversion'>CMU Graphics Lab Motion Capture Database</a>";
 	}
+
+
+
+
 }
