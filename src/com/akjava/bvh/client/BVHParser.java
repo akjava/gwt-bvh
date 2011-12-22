@@ -61,7 +61,7 @@ public class BVHParser {
 		LineSplitter splitter=new LineSplitter(replaced,10,new SplitterListener() {
 			@Override
 			public void onSuccess(List<String> lines) {
-				LogUtils.log("splited:"+Benchmark.end("split"));
+				//LogUtils.log("splited:"+Benchmark.end("split"));
 				try {
 					parseLines(lines.toArray(new String[lines.size()]));
 				} catch (InvalidLineException e) {
@@ -82,7 +82,7 @@ public class BVHParser {
 		Benchmark.start("split");
 		text=text.replace("\r", "");
 		String lines[]=text.split("\n");
-		LogUtils.log("splited:"+Benchmark.end("load"));
+		//LogUtils.log("splited:"+Benchmark.end("load"));
 		parseLines(lines);
 		
 		validate();

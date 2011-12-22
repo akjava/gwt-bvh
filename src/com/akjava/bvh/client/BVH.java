@@ -23,6 +23,15 @@ import java.util.List;
 public class BVH {
 private BVHNode hiearchy;
 private Motion motion;
+private int skips=1;
+public int getSkips() {
+	return skips;
+}
+
+public void setSkips(int skips) {
+	this.skips = skips;
+}
+
 public Motion getMotion() {
 	return motion;
 }
@@ -46,4 +55,38 @@ public List<NameAndChannel> getNameAndChannels() {
 public void add(NameAndChannel nc){
 	nameAndChannels.add(nc);
 }
+
+
+public int getFrames(){
+	int f=motion.getFrames();
+	if(f==0){
+		return 0;
+	}
+	if(skips==0){
+		return f;
+	}
+	int fs=(f-1)/skips;
+	return fs+1;// +first frame
+}
+public double getFrameTime(){
+	double f=motion.getFrameTime();
+	if(f==0){
+		return 0;
+	}
+	if(skips==0){
+		return f;
+	}
+	return f*skips;
+}
+
+public double[] getFrameAt(int index){
+	if(skips==0){
+		return motion.getMotions().get(index);
+	}else{
+		return motion.getMotions().get(index*skips);
+	}
+}
+
+
+
 }

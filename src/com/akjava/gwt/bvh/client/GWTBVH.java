@@ -17,6 +17,7 @@ package com.akjava.gwt.bvh.client;
  * limitations under the License.
  */
 
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -68,13 +69,17 @@ import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PopupPanel;
+import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 
@@ -134,7 +139,7 @@ public class GWTBVH extends SimpleDemoEntryPoint {
 	private Object3D rootGroup,boneContainer,backgroundContainer;
 	@Override
 	public void initializeOthers(WebGLRenderer renderer) {
-		cameraY=0;
+		cameraY=10;
 		defaultZoom=5;
 		canvas.setClearColorHex(0xcccccc);
 		
@@ -155,7 +160,7 @@ public class GWTBVH extends SimpleDemoEntryPoint {
 		
 		Geometry geo=THREE.PlaneGeometry(100, 100,20,20);
 		Mesh mesh=THREE.Mesh(geo, THREE.MeshBasicMaterial().color(0x666666).wireFrame(true).build());
-		mesh.setPosition(0, -17, 0);
+		//mesh.setPosition(0, -17, 0);
 		mesh.setRotation(Math.toRadians(-90), 0, 0);
 		backgroundContainer.add(mesh);
 		
@@ -364,7 +369,7 @@ public class GWTBVH extends SimpleDemoEntryPoint {
 					public void onResponseReceived(Request request, Response response) {
 						
 						String bvhText=response.getText();
-						log("loaded:"+Benchmark.end("load"));
+						//log("loaded:"+Benchmark.end("load"));
 						//useless spend allmost time with request and spliting.
 						parseBVH(bvhText);
 						loadingLabel.setText("");
@@ -375,14 +380,22 @@ public class GWTBVH extends SimpleDemoEntryPoint {
 
 @Override
 public void onError(Request request, Throwable exception) {
-				// TODO Auto-generated method stub
-				
+				Window.alert("load faild:");
 }
 				});
 			} catch (RequestException e) {
-				// TODO Auto-generated catch block
+				log(e.getMessage());
 				e.printStackTrace();
 			}
+	}
+	
+	private void setEmptyBone(){
+		if(boneRoot!=null){
+			boneContainer.remove(boneRoot);
+		}
+		boneRoot=null;
+		bvh=null;
+		
 	}
 	private void parseBVH(String bvhText){
 		final BVHParser parser=new BVHParser();
@@ -393,6 +406,8 @@ public void onError(Request request, Throwable exception) {
 			@Override
 			public void onSuccess(BVH bv) {
 				bvh=bv;
+				bvh.setSkips(skipFrames);
+				
 				BVHNode node=bvh.getHiearchy();
 				
 				if(boneRoot!=null){
@@ -409,8 +424,8 @@ public void onError(Request request, Throwable exception) {
 				
 				clock.update();
 				updatePoseIndex(poseIndex);
-				doPose(bvh,bvh.getMotion().getMotions().get(poseIndex));
-				currentFrameRange.setMax(bvh.getMotion().getFrames()-1);
+				doPose(bvh,bvh.getFrameAt(poseIndex));
+				currentFrameRange.setMax(bvh.getFrames()-1);
 			}
 			
 			@Override
@@ -470,20 +485,99 @@ Timer timer=new Timer(){
 						*/
 	
 	private long getFrameTime(int index){
-		long time=(long) (bvh.getMotion().getFrameTime()*index*1000);
+		long time=(long) (bvh.getFrameTime()*index*1000);
 		return time;
 	}
 
+	private double getPlaySpeed(){
+		String v=speedBox.getItemText(speedBox.getSelectedIndex());
+		double r=1;
+		try{
+			r=Double.parseDouble(v.substring(2));
+		}catch(Exception e){}
+		return r;
+	}
+	
+	private double playSpeed=1;
 	private void createBottomPanel(){
 		bottomPanel = new PopupPanel();
 		bottomPanel.setVisible(true);
 		bottomPanel.setSize("720px", "40px");
-		HorizontalPanel pPanel=new HorizontalPanel();
-		
-		
-		bottomPanel.add(pPanel);
+		VerticalPanel main=new VerticalPanel();
+		bottomPanel.add(main);
 		bottomPanel.show();
-		super.leftBottom(bottomPanel);
+		
+		
+		HorizontalPanel upperPanel=new HorizontalPanel();
+		upperPanel.setVerticalAlignment(HorizontalPanel.ALIGN_MIDDLE);
+		main.add(upperPanel);
+		upperPanel.add(new Label("Speed"));
+		speedBox = new ListBox();
+		speedBox.addItem("x 0.25");
+		speedBox.addItem("x 0.5");
+		speedBox.addItem("x 1");
+		speedBox.addItem("x 2");
+		speedBox.addItem("x 4");
+		speedBox.addItem("x 10");
+		speedBox.setSelectedIndex(2);
+		speedBox.addChangeHandler(new ChangeHandler() {
+			
+			@Override
+			public void onChange(ChangeEvent event) {
+				playSpeed=getPlaySpeed();
+			}
+		});
+		upperPanel.add(speedBox);
+		
+		
+		CheckBox abcheck=new CheckBox("A/B Loop");
+		upperPanel.add(abcheck);
+		
+		
+		
+		final Button asA=new Button("A:");
+		asA.setWidth("60px");
+		upperPanel.add(asA);
+		asA.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				asA.setText("A:"+currentFrameRange.getValue());
+			}
+		});
+		
+		Button asB=new Button("B:");
+		asB.setWidth("60px");
+		upperPanel.add(asB);
+		
+		upperPanel.add(new Label("Skip every frame:"));
+		final TextBox skipFrameBox=new TextBox();
+		skipFrameBox.setWidth("40px");
+		upperPanel.add(skipFrameBox);
+		
+		Button updateSkipBt=new Button("Update skips");
+		upperPanel.add(updateSkipBt);
+		updateSkipBt.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				String v=skipFrameBox.getValue();
+				
+				int sp=0;
+				try{
+				sp=Integer.parseInt(v);
+				}catch(Exception e){	
+				}
+				setBvhSkips(sp);
+			}
+		});
+		
+		
+		HorizontalPanel pPanel=new HorizontalPanel();
+		main.add(pPanel);
+		pPanel.setVerticalAlignment(HorizontalPanel.ALIGN_MIDDLE);
+		
+		
 		
 		
 		
@@ -520,10 +614,49 @@ Timer timer=new Timer(){
 		
 		pPanel.add(stopButton);
 		
+		final Button prevButton=new Button("Prev");
+		
+		prevButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				int c=currentFrameRange.getValue();
+				c--;
+				/*
+				if(c==0 && ignoreFirst.getValue()){
+					c=1;
+				}*/
+				
+				if(c<0){
+					c=0;
+				}
+				currentFrameRange.setValue(c);
+				updatePoseIndex(currentFrameRange.getValue());
+			}
+		});
+		
+		pPanel.add(prevButton);
+		
+		final Button nextButton=new Button("Next");
+		nextButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				int c=currentFrameRange.getValue();
+				c++;
+				if(c>=bvh.getFrames()){
+					c=bvh.getFrames()-1;
+				}
+				currentFrameRange.setValue(c);
+				updatePoseIndex(currentFrameRange.getValue());
+			}
+		});
+		
+		pPanel.add(nextButton);
+		
+		
 		
 		
 		currentFrameRange = new HTML5InputRange(0,1000,0);
-		currentFrameRange.setWidth("500px");
+		currentFrameRange.setWidth("450px");
 		pPanel.add(currentFrameRange);
 		
 		currentFrameRange.addMouseUpHandler(new MouseUpHandler() {
@@ -538,10 +671,22 @@ Timer timer=new Timer(){
 		currentFrameLabel = new Label();
 		pPanel.add(currentFrameLabel);
 		
+		super.leftBottom(bottomPanel);
 	}
 	
 	
-	
+	private int skipFrames;
+	private void setBvhSkips(int skips){
+		//TODO
+		//set global for newload
+		skipFrames=skips;
+		//set current bvh
+		bvh.setSkips(skips);
+		
+		updatePoseIndex(0);
+		currentFrameRange.setMax(bvh.getFrames()-1);
+		//update labels
+	}
 	
 	@Override
 	public void createControl(Panel parent) {
@@ -555,6 +700,7 @@ Timer timer=new Timer(){
 		
 		translatePosition = new CheckBox("Translate Position");
 		parent.add(translatePosition);
+		translatePosition.setValue(true);
 		
 		ignoreFirst = new CheckBox("Ignore First Frame(Usually Pose)");
 		ignoreFirst.setValue(true);
@@ -719,19 +865,20 @@ Timer timer=new Timer(){
 			
 			@Override
 			public void onClick(ClickEvent event) {
-				if(bvhFileList.size()==0){
-					return;
-				}
-				File file=dataList.getSelection();
-				int index=bvhFileList.indexOf(file);
-				index++;
-				if(index>bvhFileList.size()-1){
-					index=0;
-				}
-				dataList.setSelection(bvhFileList.get(index));
+				doNextMotion();
 			}
 		});
 		fileControl.add(nextBt);
+		
+		fileControl.add(new Label("Auto Play"));
+		loopTime = new ListBox();
+		loopTime.addItem("None");
+		loopTime.addItem("1");
+		loopTime.addItem("3");
+		loopTime.addItem("10");
+		loopTime.setSelectedIndex(0);
+		fileControl.add(loopTime);
+		
 		
 		file.setStylePrimaryName("fileborder");
 		/*
@@ -764,10 +911,10 @@ Timer timer=new Timer(){
 		dataList = new DataList<File>(new DataListRenderer<File>(){
 			@Override
 			public Widget createWidget(File data,DataList<File> dataList) {
-				// TODO Auto-generated method stub
+
 				return new BVHFileWidget(data,dataList);
 			}});
-		dataList.setHeight("100px");
+		dataList.setHeight("60px");
 		parent.add(dataList);
 		dataList.setListener(new ChangeSelectionListener<File>() {
 			@Override
@@ -782,11 +929,48 @@ Timer timer=new Timer(){
 				reader.readAsText(data,"utf-8");
 			}
 		});
-		
+		HorizontalPanel dataControls=new HorizontalPanel();
+		parent.add(dataControls);
+		Button remove=new Button("Remove");
+		remove.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				if(bvhFileList.size()==0){
+					return;
+				}
+				File file=dataList.getSelection();
+				int index=bvhFileList.indexOf(file);
+				bvhFileList.remove(file);
+				if(index>=bvhFileList.size()){
+					index=0;
+				}
+				dataList.setDatas(bvhFileList);
+				if(bvhFileList.size()!=0){
+				dataList.setSelection(bvhFileList.get(index));
+				}else{
+					setEmptyBone();
+				}
+			}
+		});
+		dataControls.add(remove);
 		createBottomPanel();
 		showControl();
 	}
 
+	private void doNextMotion(){
+		if(bvhFileList.size()==0){
+			return;
+		}
+		File file=dataList.getSelection();
+		int index=bvhFileList.indexOf(file);
+		index++;
+		if(index>bvhFileList.size()-1){
+			index=0;
+		}
+		dataList.setSelection(bvhFileList.get(index));
+	}
+	
 	protected void doLoad(String itemText) {
 		String[] g_n=itemText.split("_");
 		loadBVH("bvhs/"+g_n[0]+"/"+itemText+".bvh");
@@ -810,8 +994,8 @@ Timer timer=new Timer(){
 	private void updatePoseIndex(int index){
 		//poseIndex=index;
 		currentFrameRange.setValue(index);
-		currentFrameLabel.setText((index+1)+"/"+bvh.getMotion().size());
-		doPose(bvh,bvh.getMotion().getMotions().get(index));
+		currentFrameLabel.setText((index+1)+"/"+bvh.getFrames());
+		doPose(bvh,bvh.getFrameAt(index));
 	}
 	
 	Clock clock=new Clock();
@@ -819,6 +1003,13 @@ Timer timer=new Timer(){
 	//private CellList<File> bvhCellList;
 	//private SingleSelectionModel<File> fileSelectionModel;
 	private DataList<File> dataList;
+
+	
+	private int currentLoop=0;
+	private ListBox loopTime;
+
+	private ListBox speedBox;
+	private long remainTime;
 	@Override
 	protected void beforeUpdate(WebGLRenderer renderer) {
 		/*
@@ -839,6 +1030,7 @@ Timer timer=new Timer(){
 		//cameraY=positionYRange.getValue();
 		//cameraX=positionXRange.getValue();
 		
+		
 		Object3DUtils.setVisibleAll(backgroundContainer, drawBackground.getValue());
 		//backgroundContainer.setVisible();
 		
@@ -850,19 +1042,52 @@ Timer timer=new Timer(){
 		
 		if(bvh!=null){
 			if(playing){
-				long last=clock.delta();
-				int frame=(int) ((double)last/(bvh.getMotion().getFrameTime()*1000));//not good at sync
+				long last=clock.delta()+remainTime;
+				double ftime=(bvh.getFrameTime()*1000/playSpeed);
+				
+				if(ftime==0){
+					return; //somehow frame become strange
+				}
+				int frame=(int) (last/ftime);
+				remainTime=(long) (last-(ftime*frame));
 			//	log(""+frame);
+				//GWT.log(ftime+","+frame+","+remainTime);
 			if(frame>0){
 			int index=currentFrameRange.getValue()+frame;
 			
-			index%=bvh.getMotion().getFrames();
+			
+			
+			boolean overLoop=index>=bvh.getFrames();
+			
+			index%=bvh.getFrames();
 			
 			if(ignoreFirst.getValue() && index==0){
 				index=1;
 			}
 			
-			updatePoseIndex(index);		
+			updatePoseIndex(index);	
+			
+			
+			if(overLoop && bvhFileList.size()>1){
+				//next Frame
+				try{
+				int maxLoop=Integer.parseInt(loopTime.getItemText(loopTime.getSelectedIndex()));
+				//log("maxloop:"+maxLoop);
+				if(maxLoop>0){
+					currentLoop++;
+					if(currentLoop>=maxLoop){
+						currentLoop=0;
+						doNextMotion();
+					}
+				}
+				
+				}catch(Exception e){}
+			}
+			
+			
+			
+			
+				
 			}
 		/*		
 		double delta=(double)(System.currentTimeMillis()-ctime)/1000;
