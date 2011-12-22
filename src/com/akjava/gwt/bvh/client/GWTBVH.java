@@ -718,9 +718,17 @@ Timer timer=new Timer(){
 		parent.add(drawBackground);
 		drawBackground.setValue(true);
 		
+		
 		translatePosition = new CheckBox("Translate Position");
 		parent.add(translatePosition);
 		translatePosition.setValue(true);
+		translatePosition.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				updatePoseIndex(currentFrameRange.getValue());
+			}
+		});
 		
 		ignoreFirst = new CheckBox("Ignore First Frame(Usually Pose)");
 		ignoreFirst.setValue(true);
@@ -974,6 +982,22 @@ Timer timer=new Timer(){
 			}
 		});
 		dataControls.add(remove);
+		
+		Button removeAll=new Button("Remove All");
+		removeAll.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				if(bvhFileList.size()==0){
+					return;
+				}
+				dataList.clear();
+				setEmptyBone();
+				
+			}
+		});
+		dataControls.add(removeAll);
+		
 		createBottomPanel();
 		showControl();
 	}
