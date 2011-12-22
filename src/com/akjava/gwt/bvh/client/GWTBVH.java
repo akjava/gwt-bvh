@@ -713,116 +713,7 @@ Timer timer=new Timer(){
 		
 		parent.add(loadingLabel);
 		
-		
-		drawBackground = new CheckBox("Draw Background");
-		parent.add(drawBackground);
-		drawBackground.setValue(true);
-		
-		
-		translatePosition = new CheckBox("Translate Position");
-		parent.add(translatePosition);
-		translatePosition.setValue(true);
-		translatePosition.addClickHandler(new ClickHandler() {
-			
-			@Override
-			public void onClick(ClickEvent event) {
-				updatePoseIndex(currentFrameRange.getValue());
-			}
-		});
-		
-		ignoreFirst = new CheckBox("Ignore First Frame(Usually Pose)");
-		ignoreFirst.setValue(true);
-		parent.add(ignoreFirst);
-		
-		
-		
-		HorizontalPanel h1=new HorizontalPanel();
-		
-		rotationRange = new HTML5InputRange(-180,180,0);
-		parent.add(HTML5Builder.createRangeLabel("X-Rotate:", rotationRange));
-		parent.add(h1);
-		h1.add(rotationRange);
-		Button reset=new Button("Reset");
-		reset.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				rotationRange.setValue(0);
-			}
-		});
-		h1.add(reset);
-		
-		HorizontalPanel h2=new HorizontalPanel();
-		
-		rotationYRange = new HTML5InputRange(-180,180,0);
-		parent.add(HTML5Builder.createRangeLabel("Y-Rotate:", rotationYRange));
-		parent.add(h2);
-		h2.add(rotationYRange);
-		Button reset2=new Button("Reset");
-		reset2.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				rotationYRange.setValue(0);
-			}
-		});
-		h2.add(reset2);
-		
-		
-		HorizontalPanel h3=new HorizontalPanel();
-		rotationZRange = new HTML5InputRange(-180,180,0);
-		parent.add(HTML5Builder.createRangeLabel("Z-Rotate:", rotationZRange));
-		parent.add(h3);
-		h3.add(rotationZRange);
-		Button reset3=new Button("Reset");
-		reset3.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				rotationZRange.setValue(0);
-			}
-		});
-		h3.add(reset3);
-		
-		HorizontalPanel h4=new HorizontalPanel();
-		positionXRange = new HTML5InputRange(-50,50,0);
-		parent.add(HTML5Builder.createRangeLabel("X-Position:", positionXRange));
-		parent.add(h4);
-		h4.add(positionXRange);
-		Button reset4=new Button("Reset");
-		reset4.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				positionXRange.setValue(0);
-			}
-		});
-		h4.add(reset4);
-		
-		HorizontalPanel h5=new HorizontalPanel();
-		positionYRange = new HTML5InputRange(-50,50,0);
-		parent.add(HTML5Builder.createRangeLabel("Y-Position:", positionYRange));
-		parent.add(h5);
-		h5.add(positionYRange);
-		Button reset5=new Button("Reset");
-		reset5.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				positionYRange.setValue(0);
-			}
-		});
-		h5.add(reset5);
-		
-		HorizontalPanel h6=new HorizontalPanel();
-		positionZRange = new HTML5InputRange(-50,50,0);
-		parent.add(HTML5Builder.createRangeLabel("Z-Position:", positionZRange));
-		parent.add(h6);
-		h6.add(positionZRange);
-		Button reset6=new Button("Reset");
-		reset6.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				positionZRange.setValue(0);
-			}
-		});
-		h6.add(reset6);
-		
+
 		parent.add(new Label("Load BVH File"));
 		FileUpload file=new FileUpload();
 		
@@ -868,6 +759,7 @@ Timer timer=new Timer(){
 		});
 		parent.add(file);
 		HorizontalPanel fileControl=new HorizontalPanel();
+		fileControl.setVerticalAlignment(HorizontalPanel.ALIGN_MIDDLE);
 		parent.add(fileControl);
 		Button prevBt=new Button("Prev");
 		prevBt.addClickHandler(new ClickHandler() {
@@ -997,6 +889,118 @@ Timer timer=new Timer(){
 			}
 		});
 		dataControls.add(removeAll);
+		
+		
+		
+		drawBackground = new CheckBox("Draw Background");
+		parent.add(drawBackground);
+		drawBackground.setValue(true);
+		
+		
+		translatePosition = new CheckBox("Translate Position");
+		parent.add(translatePosition);
+		translatePosition.setValue(true);
+		translatePosition.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				updatePoseIndex(currentFrameRange.getValue());
+			}
+		});
+		
+		ignoreFirst = new CheckBox("Ignore First Frame(Usually Pose)");
+		ignoreFirst.setValue(true);
+		parent.add(ignoreFirst);
+		
+		
+		
+		HorizontalPanel h1=new HorizontalPanel();
+		
+		rotationRange = new HTML5InputRange(-180,180,0);
+		parent.add(HTML5Builder.createRangeLabel("X-Rotate:", rotationRange));
+		parent.add(h1);
+		h1.add(rotationRange);
+		Button reset=new Button("Reset");
+		reset.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				rotationRange.setValue(0);
+			}
+		});
+		h1.add(reset);
+		
+		HorizontalPanel h2=new HorizontalPanel();
+		
+		rotationYRange = new HTML5InputRange(-180,180,0);
+		parent.add(HTML5Builder.createRangeLabel("Y-Rotate:", rotationYRange));
+		parent.add(h2);
+		h2.add(rotationYRange);
+		Button reset2=new Button("Reset");
+		reset2.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				rotationYRange.setValue(0);
+			}
+		});
+		h2.add(reset2);
+		
+		
+		HorizontalPanel h3=new HorizontalPanel();
+		rotationZRange = new HTML5InputRange(-180,180,0);
+		parent.add(HTML5Builder.createRangeLabel("Z-Rotate:", rotationZRange));
+		parent.add(h3);
+		h3.add(rotationZRange);
+		Button reset3=new Button("Reset");
+		reset3.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				rotationZRange.setValue(0);
+			}
+		});
+		h3.add(reset3);
+		
+		HorizontalPanel h4=new HorizontalPanel();
+		positionXRange = new HTML5InputRange(-50,50,0);
+		parent.add(HTML5Builder.createRangeLabel("X-Position:", positionXRange));
+		parent.add(h4);
+		h4.add(positionXRange);
+		Button reset4=new Button("Reset");
+		reset4.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				positionXRange.setValue(0);
+			}
+		});
+		h4.add(reset4);
+		
+		HorizontalPanel h5=new HorizontalPanel();
+		positionYRange = new HTML5InputRange(-50,50,0);
+		parent.add(HTML5Builder.createRangeLabel("Y-Position:", positionYRange));
+		parent.add(h5);
+		h5.add(positionYRange);
+		Button reset5=new Button("Reset");
+		reset5.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				positionYRange.setValue(0);
+			}
+		});
+		h5.add(reset5);
+		
+		HorizontalPanel h6=new HorizontalPanel();
+		positionZRange = new HTML5InputRange(-50,50,0);
+		parent.add(HTML5Builder.createRangeLabel("Z-Position:", positionZRange));
+		parent.add(h6);
+		h6.add(positionZRange);
+		Button reset6=new Button("Reset");
+		reset6.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				positionZRange.setValue(0);
+			}
+		});
+		h6.add(reset6);
+		
 		
 		createBottomPanel();
 		showControl();
