@@ -502,7 +502,7 @@ Timer timer=new Timer(){
 	private void createBottomPanel(){
 		bottomPanel = new PopupPanel();
 		bottomPanel.setVisible(true);
-		bottomPanel.setSize("720px", "40px");
+		bottomPanel.setSize("650px", "40px");
 		VerticalPanel main=new VerticalPanel();
 		bottomPanel.add(main);
 		bottomPanel.show();
@@ -530,8 +530,8 @@ Timer timer=new Timer(){
 		upperPanel.add(speedBox);
 		
 		
-		CheckBox abcheck=new CheckBox("A/B Loop");
-		upperPanel.add(abcheck);
+		abLoopCheck = new CheckBox("A/B Loop");
+		upperPanel.add(abLoopCheck);
 		
 		
 		
@@ -542,13 +542,22 @@ Timer timer=new Timer(){
 			
 			@Override
 			public void onClick(ClickEvent event) {
-				asA.setText("A:"+currentFrameRange.getValue());
+				aFrame=currentFrameRange.getValue();
+				asA.setText("A:"+(aFrame+1));
 			}
 		});
 		
-		Button asB=new Button("B:");
+		final Button asB=new Button("B:");
 		asB.setWidth("60px");
 		upperPanel.add(asB);
+		asB.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				bFrame=currentFrameRange.getValue();
+				asB.setText("B:"+(bFrame+1));
+			}
+		});
 		
 		upperPanel.add(new Label("Skip every frame:"));
 		final TextBox skipFrameBox=new TextBox();
@@ -656,7 +665,7 @@ Timer timer=new Timer(){
 		
 		
 		currentFrameRange = new HTML5InputRange(0,1000,0);
-		currentFrameRange.setWidth("450px");
+		currentFrameRange.setWidth("420px");
 		pPanel.add(currentFrameRange);
 		
 		currentFrameRange.addMouseUpHandler(new MouseUpHandler() {
@@ -673,6 +682,8 @@ Timer timer=new Timer(){
 		
 		super.leftBottom(bottomPanel);
 	}
+	private int aFrame;
+	private int bFrame;
 	
 	
 	private int skipFrames;
@@ -1010,6 +1021,8 @@ Timer timer=new Timer(){
 
 	private ListBox speedBox;
 	private long remainTime;
+
+	private CheckBox abLoopCheck;
 	@Override
 	protected void beforeUpdate(WebGLRenderer renderer) {
 		/*
@@ -1029,6 +1042,17 @@ Timer timer=new Timer(){
 		
 		//cameraY=positionYRange.getValue();
 		//cameraX=positionXRange.getValue();
+		
+		//validate ab-check
+		boolean abLoop=abLoopCheck.getValue();
+		if(abLoop){
+			if(aFrame>=bFrame){
+				abLoopCheck.setValue(false);
+			}
+			if(aFrame>bvh.getFrames()-1 || bFrame>bvh.getFrames()-1){
+				abLoopCheck.setValue(false);
+			}
+		}
 		
 		
 		Object3DUtils.setVisibleAll(backgroundContainer, drawBackground.getValue());
@@ -1052,23 +1076,32 @@ Timer timer=new Timer(){
 				remainTime=(long) (last-(ftime*frame));
 			//	log(""+frame);
 				//GWT.log(ftime+","+frame+","+remainTime);
+			int minFrame=0;
+			int maxFrame=bvh.getFrames();
+			
+			if(abLoop){
+				minFrame=aFrame;
+				maxFrame=bFrame;
+			}
+			
 			if(frame>0){
 			int index=currentFrameRange.getValue()+frame;
 			
 			
 			
-			boolean overLoop=index>=bvh.getFrames();
+			boolean overLoop=index>=maxFrame;
 			
-			index%=bvh.getFrames();
+			index=(index-minFrame)%(maxFrame-minFrame);
+			index+=minFrame;
 			
-			if(ignoreFirst.getValue() && index==0){
+			if(ignoreFirst.getValue() && index==0 &&minFrame==0){
 				index=1;
 			}
 			
 			updatePoseIndex(index);	
 			
 			
-			if(overLoop && bvhFileList.size()>1){
+			if(overLoop && bvhFileList.size()>1 && !abLoop){
 				//next Frame
 				try{
 				int maxLoop=Integer.parseInt(loopTime.getItemText(loopTime.getSelectedIndex()));
