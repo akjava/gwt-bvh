@@ -10,7 +10,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 //this is easy to scroll than CellList system
 //use cell list
-public class DataList<T> extends ScrollPanel{
+public class DataListCell<T> extends ScrollPanel{
 List<T> datas=new ArrayList<T>();
 T selected;
 private VerticalPanel panel;
@@ -28,7 +28,7 @@ public void setListener(ChangeSelectionListener<T> listener) {
 }
 
 
-public DataList(DataListRenderer<T> renderer){
+public DataListCell(DataListRenderer<T> renderer){
 	panel=new VerticalPanel();
 	this.renderer=renderer;
 	setWidget(panel);
@@ -73,7 +73,7 @@ private void updateWidget(){
 }
 
 public interface DataListRenderer<T> {
-	public Widget createWidget(T data,DataList<T> dataList);
+	public Widget createWidget(T data,DataListCell<T> dataList);
 }
 public interface ChangeSelectionListener<T>{
 	public void onChangeSelection(T data);

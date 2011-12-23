@@ -31,9 +31,10 @@ import com.akjava.bvh.client.Channels;
 import com.akjava.bvh.client.NameAndChannel;
 import com.akjava.bvh.client.Vec3;
 import com.akjava.gwt.bvh.client.list.BVHFileWidget;
-import com.akjava.gwt.bvh.client.list.DataList;
-import com.akjava.gwt.bvh.client.list.DataList.ChangeSelectionListener;
-import com.akjava.gwt.bvh.client.list.DataList.DataListRenderer;
+import com.akjava.gwt.bvh.client.list.DataListCell;
+import com.akjava.gwt.bvh.client.list.DataListCell.ChangeSelectionListener;
+import com.akjava.gwt.bvh.client.list.DataListCell.DataListRenderer;
+import com.akjava.gwt.bvh.client.resources.Bundles;
 import com.akjava.gwt.html5.client.HTML5InputRange;
 import com.akjava.gwt.html5.client.extra.HTML5Builder;
 import com.akjava.gwt.html5.client.file.File;
@@ -146,6 +147,8 @@ public class GWTBVH extends SimpleDemoEntryPoint {
 	Map<String,Vector3> boneSizeMap=new HashMap<String,Vector3>();
 
 	private Object3D rootGroup,boneContainer,backgroundContainer;
+	
+	private Map<String,BoxData> boxDatas;
 	@Override
 	public void initializeOthers(WebGLRenderer renderer) {
 		cameraY=10;
@@ -153,13 +156,14 @@ public class GWTBVH extends SimpleDemoEntryPoint {
 		canvas.setClearColorHex(0xcccccc);
 		
 		
+		boxDatas=new BoxDataParser().parse(Bundles.INSTANCE.boxsize().getText());
 		
 		scene.add(THREE.AmbientLight(0x888888));
 		Light pointLight = THREE.PointLight(0xffffff);
 		pointLight.setPosition(0, 10, 300);
 		scene.add(pointLight);
 		
-		doLoad("80_72");
+		doLoad("14_08");
 		
 		rootGroup=THREE.Object3D();
 		scene.add(rootGroup);
@@ -313,12 +317,15 @@ public class GWTBVH extends SimpleDemoEntryPoint {
 		Mesh line=THREE.Line(lineG, THREE.LineBasicMaterial().color(0).build());
 		return line;
 	}
-	public void doLog(Object3D parent,BVHNode node){
+	
+	private List<Object3D> bodyMeshs=new ArrayList<Object3D>();
+	String tmp="";
+	public void doJoint(Object3D parent,BVHNode pNode,BVHNode node){
 		GWT.log(node.getName()+","+node.getOffset()+",endsite:"+node.getEndSite());
 		GWT.log(node.getChannels().toString());
 		
 		Object3D group=THREE.Object3D();
-		Mesh mesh=THREE.Mesh(THREE.CubeGeometry(.3,.3, .3), THREE.MeshLambertMaterial().color(0xffffff).build());
+		Mesh mesh=THREE.Mesh(THREE.CubeGeometry(.4,.4, .4), THREE.MeshLambertMaterial().color(0x00ff00).build());
 		group.add(mesh);
 		mesh.setName(node.getName());
 		
@@ -326,6 +333,31 @@ public class GWTBVH extends SimpleDemoEntryPoint {
 		group.setPosition(THREE.Vector3(node.getOffset().getX(), node.getOffset().getY(), node.getOffset().getZ()));
 		jointMap.put(node.getName(), group);
 		
+		//create half
+		Vector3 half=group.getPosition().clone();
+		if(half.getX()!=0 || half.getY()!=0 || half.getY()!=0){
+		half.divideScalar(2);
+		//Mesh hmesh=THREE.Mesh(THREE.CubeGeometry(.2,.2,.2), THREE.MeshLambertMaterial().color(0xffffff).build());
+		Mesh hmesh=THREE.Mesh(THREE.CylinderGeometry(.1,.1,.2,6), THREE.MeshLambertMaterial().color(0xffffff).build());
+		
+		hmesh.setPosition(half);
+		parent.add(hmesh);
+		bodyMeshs.add(hmesh);
+		
+		
+		BoxData data=boxDatas.get(pNode.getName());
+		if(data!=null){
+			hmesh.setScale(data.getScaleX(), data.getScaleY(), data.getScaleZ());
+			hmesh.getRotation().setZ(Math.toRadians(data.getRotateZ()));
+		}
+		
+		if(pNode!=null){//TODO remove
+			tmp+=pNode.getName()+",1,1,1\n";
+		}
+		
+		}
+		
+		//line
 		Mesh l1=createLine(new Vec3(),node.getOffset());
 		parent.add(l1);
 		
@@ -338,12 +370,33 @@ public class GWTBVH extends SimpleDemoEntryPoint {
 			lineG.vertices().push(THREE.Vertex(THREE.Vector3(node.getEndSite().getX(), node.getEndSite().getY(), node.getEndSite().getZ())));
 			Mesh line=THREE.Line(lineG, THREE.LineBasicMaterial().color(0).build());
 			group.add(line);
+			
+			Vector3 half2=end.getPosition().clone();
+			if(half2.getX()!=0 || half2.getY()!=0 || half2.getY()!=0){
+			half2.divideScalar(2);
+			//Mesh hmesh=THREE.Mesh(THREE.CubeGeometry(.1,.1,.1), THREE.MeshLambertMaterial().color(0xffffff).build());
+			Mesh hmesh=THREE.Mesh(THREE.CylinderGeometry(.1,.1,.2,6), THREE.MeshLambertMaterial().color(0xffffff).build());
+			
+			hmesh.setPosition(half2);
+			group.add(hmesh);
+			tmp+=node.getName()+",1,1,1\n";
+			
+			BoxData data=boxDatas.get(node.getName());
+			if(data!=null){
+				hmesh.setScale(data.getScaleX(), data.getScaleY(), data.getScaleZ());
+			}
+			if(node.getName().equals("Head")){
+				hmesh.getPosition().setZ(hmesh.getPosition().getZ()+0.5);
+			}
+			bodyMeshs.add(hmesh);
+			
+			}
 		}
 		parent.add(group);
 		List<BVHNode> joints=node.getJoints();
 		if(joints!=null){
 			for(BVHNode joint:joints){
-			doLog(group,joint);
+			doJoint(group,node,joint);
 			}
 		}
 		
@@ -424,8 +477,8 @@ public void onError(Request request, Throwable exception) {
 				}
 				boneRoot=THREE.Object3D();
 				boneContainer.add(boneRoot);
-				doLog(boneRoot,node);
-				
+				doJoint(boneRoot,null,node);
+				GWT.log(tmp);
 				int poseIndex=0;
 				if(ignoreFirst.getValue()){
 					poseIndex=1;
@@ -696,6 +749,8 @@ Timer timer=new Timer(){
 	
 	
 	private int skipFrames;
+
+	private CheckBox drawMesh;
 	private void setBvhSkips(int skips){
 		//TODO
 		//set global for newload
@@ -731,8 +786,8 @@ Timer timer=new Timer(){
 					bvhFileList.add(files.get(i));
 				}
 				
-				dataList.setDatas(bvhFileList);
-				dataList.setSelection(files.get(0));
+				dataListCell.setDatas(bvhFileList);
+				dataListCell.setSelection(files.get(0));
 				//bvhCellList.setRowCount(bvhFileList.size(), true);
 				//bvhCellList.setRowData(bvhFileList);
 				
@@ -769,13 +824,13 @@ Timer timer=new Timer(){
 				if(bvhFileList.size()==0){
 					return;
 				}
-				File file=dataList.getSelection();
+				File file=dataListCell.getSelection();
 				int index=bvhFileList.indexOf(file);
 				index--;
 				if(index<0){
 					index=bvhFileList.size()-1;
 				}
-				dataList.setSelection(bvhFileList.get(index));
+				dataListCell.setSelection(bvhFileList.get(index));
 			}
 		});
 		fileControl.add(prevBt);
@@ -828,15 +883,15 @@ Timer timer=new Timer(){
 		*/
 		
 		
-		dataList = new DataList<File>(new DataListRenderer<File>(){
+		dataListCell = new DataListCell<File>(new DataListRenderer<File>(){
 			@Override
-			public Widget createWidget(File data,DataList<File> dataList) {
+			public Widget createWidget(File data,DataListCell<File> dataList) {
 
 				return new BVHFileWidget(data,dataList);
 			}});
-		dataList.setHeight("60px");
-		parent.add(dataList);
-		dataList.setListener(new ChangeSelectionListener<File>() {
+		dataListCell.setHeight("60px");
+		parent.add(dataListCell);
+		dataListCell.setListener(new ChangeSelectionListener<File>() {
 			@Override
 			public void onChangeSelection(File data) {
 				final FileReader reader=FileReader.createFileReader();
@@ -859,15 +914,15 @@ Timer timer=new Timer(){
 				if(bvhFileList.size()==0){
 					return;
 				}
-				File file=dataList.getSelection();
+				File file=dataListCell.getSelection();
 				int index=bvhFileList.indexOf(file);
 				bvhFileList.remove(file);
 				if(index>=bvhFileList.size()){
 					index=0;
 				}
-				dataList.setDatas(bvhFileList);
+				dataListCell.setDatas(bvhFileList);
 				if(bvhFileList.size()!=0){
-				dataList.setSelection(bvhFileList.get(index));
+				dataListCell.setSelection(bvhFileList.get(index));
 				}else{
 					setEmptyBone();
 				}
@@ -883,7 +938,8 @@ Timer timer=new Timer(){
 				if(bvhFileList.size()==0){
 					return;
 				}
-				dataList.clear();
+				bvhFileList.clear();
+				dataListCell.setDatas(bvhFileList);
 				setEmptyBone();
 				
 			}
@@ -891,6 +947,17 @@ Timer timer=new Timer(){
 		dataControls.add(removeAll);
 		
 		
+		
+		drawMesh = new CheckBox("Draw Body Mesh");
+		parent.add(drawMesh);
+		drawMesh.setValue(true);
+		drawMesh.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				doChangeVisibleBodyMesh();
+			}
+		});
 		
 		drawBackground = new CheckBox("Draw Background");
 		parent.add(drawBackground);
@@ -1006,17 +1073,23 @@ Timer timer=new Timer(){
 		showControl();
 	}
 
+	protected void doChangeVisibleBodyMesh() {
+		for(Object3D object:bodyMeshs){
+			object.setVisible(drawMesh.getValue());
+		}
+	}
+
 	private void doNextMotion(){
 		if(bvhFileList.size()==0){
 			return;
 		}
-		File file=dataList.getSelection();
+		File file=dataListCell.getSelection();
 		int index=bvhFileList.indexOf(file);
 		index++;
 		if(index>bvhFileList.size()-1){
 			index=0;
 		}
-		dataList.setSelection(bvhFileList.get(index));
+		dataListCell.setSelection(bvhFileList.get(index));
 	}
 	
 	protected void doLoad(String itemText) {
@@ -1050,7 +1123,7 @@ Timer timer=new Timer(){
 	private List<File> bvhFileList=new ArrayList<File>();
 	//private CellList<File> bvhCellList;
 	//private SingleSelectionModel<File> fileSelectionModel;
-	private DataList<File> dataList;
+	private DataListCell<File> dataListCell;
 
 	
 	private int currentLoop=0;
@@ -1069,7 +1142,7 @@ Timer timer=new Timer(){
 		
 		//validate ab-check
 		boolean abLoop=abLoopCheck.getValue();
-		if(abLoop){
+		if(abLoop && bvh!=null){
 			if(aFrame>=bFrame){
 				abLoopCheck.setValue(false);
 			}
@@ -1084,7 +1157,7 @@ Timer timer=new Timer(){
 		
 		boneContainer.setPosition(positionXRange.getValue(), positionYRange.getValue(), positionZRange.getValue());
 		
-		if(boneRoot!=null){
+		if(rootGroup!=null){
 		rootGroup.getRotation().set(Math.toRadians(rotationRange.getValue()),Math.toRadians(rotationYRange.getValue()),Math.toRadians(rotationZRange.getValue()));
 		}
 		

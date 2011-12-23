@@ -8,8 +8,8 @@ import com.google.gwt.user.client.ui.Label;
 
 public class BVHFileWidget extends HorizontalPanel {
 private File file;
-private DataList<File> dataList;
-public BVHFileWidget(File f,DataList<File> data){
+private DataListCell<File> dataList;
+public BVHFileWidget(File f,DataListCell<File> data){
 	this.file=f;
 	this.dataList=data;
 	Label label=new Label(file.getFileName());
