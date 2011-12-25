@@ -1236,7 +1236,7 @@ Timer timer=new Timer(){
 	}
 	@Override
 	public String getHtml(){
-		return super.getHtml()+" Sample BVH File from <a href='https://sites.google.com/a/cgspeed.com/cgspeed/motion-capture/cmu-bvh-conversion'>CMU Graphics Lab Motion Capture Database</a>";
+		return super.getHtml()+". Sample BVH File from <a href='https://sites.google.com/a/cgspeed.com/cgspeed/motion-capture/cmu-bvh-conversion'>CMU Graphics Lab Motion Capture Database.</a><br/> More Infomation click <a href='http://webgl.akjava.com'>webgl.akjava.com</a>";
 	}
 
 

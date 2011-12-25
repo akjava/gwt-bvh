@@ -26,5 +26,5 @@
 <inherits name="com.akjava.gwt.lib.Commons"/>
 <inherits name="com.akjava.bvh.Bvh"/>
 
- <set-property name="user.agent" value="safari"/>
+
 </module>

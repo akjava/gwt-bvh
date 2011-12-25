@@ -1,0 +1,8 @@
+{
+  "appName": {
+    "message": "BVH Motion Player"
+  },
+  "appDesc": {
+    "message": "WebGL Based BVH Motion File Player can change speed or frame skips or A/B loops"
+  }
+}
