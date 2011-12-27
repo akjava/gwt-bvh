@@ -27,6 +27,7 @@ public class AnimationDataConverter {
 		String oldName=null;
 		for(int i=0;i<bvh.getNameAndChannels().size();i++){
 			String newName=bvh.getNameAndChannels().get(i).getName();
+
 			if(!newName.equals(oldName)){
 				nameOrderList.add(newName);
 				oldName=newName;
@@ -78,7 +79,9 @@ public class AnimationDataConverter {
 			BVHNode rootNode=bvh.getHiearchy();
 			Object3D o3d=jointMap.get(rootNode.getName());
 			Matrix4 mx=THREE.Matrix4();
-			Vector3 bpos=o3d.getPosition().addSelf(BVHUtils.toVector3(rootNode.getOffset()));
+			
+			Vector3 bpos=THREE.Vector3();
+					bpos.add(o3d.getPosition(),BVHUtils.toVector3(rootNode.getOffset()));
 			//LogUtils.log(rootNode.getName()+","+bpos.getX()+","+bpos.getY()+","+bpos.getZ());
 			mx.setPosition(bpos);
 			mx.setRotationFromEuler(o3d.getRotation(), "XYZ");
@@ -120,7 +123,9 @@ public class AnimationDataConverter {
 			Object3D o3d=jointMap.get(children.getName());
 			//GWT.log(message);
 			Matrix4 mx=THREE.Matrix4();
-			mx.setPosition(o3d.getPosition().addSelf(BVHUtils.toVector3(children.getOffset())));
+			Vector3 mpos=THREE.Vector3();
+			mpos.add(o3d.getPosition(), BVHUtils.toVector3(children.getOffset()));
+			mx.setPosition(mpos);
 			mx.setRotationFromEuler(o3d.getRotation(), "XYZ");
 			//mx=mx.multiply(nodeToMatrix(children), mx);
 			
