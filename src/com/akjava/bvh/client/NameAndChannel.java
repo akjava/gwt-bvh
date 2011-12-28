@@ -19,6 +19,11 @@ package com.akjava.bvh.client;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * each data target,usually bones x 3
+ * @author aki
+ *
+ */
 public class NameAndChannel {
 private String name;
 private int channelType;

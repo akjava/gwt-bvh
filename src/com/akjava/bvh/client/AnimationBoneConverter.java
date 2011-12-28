@@ -35,8 +35,8 @@ public class AnimationBoneConverter {
 		
 		
 		parentIdMaps=new HashMap<String,Integer>();
-		for(int i=0;i<bvh.getNameAndChannels().size();i++){
-			parentIdMaps.put(bvh.getNameAndChannels().get(i).getName(), i);
+		for(int i=0;i<nameOrderList.size();i++){
+			parentIdMaps.put(nameOrderList.get(i), i);
 		}
 		JsArray<AnimationBone> array=(JsArray<AnimationBone>)JsArray.createArray();
 		

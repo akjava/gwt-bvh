@@ -69,7 +69,7 @@ public class AnimationDataConverter {
 		double ft=bvh.getFrameTime();
 		data.setName("BVHMotion");
 		data.setFps(30);//noway
-		data.setLength(ft*bvh.getFrames());
+		data.setLength(ft*(bvh.getFrames()-1));
 		//convert each frame
 		for(int i=0;i<bvh.getFrames();i++){	
 			doPose(bvh,bvh.getFrameAt(i));
