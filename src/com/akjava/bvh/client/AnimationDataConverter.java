@@ -130,7 +130,9 @@ public class AnimationDataConverter {
 			//mx=mx.multiply(nodeToMatrix(children), mx);
 			
 			Matrix4 parentM=matrixMap.get(parent.getName());
-			mx=mx.multiply(parentM, mx);
+			
+			//TODO If you wish absolutepath use parent matrix,but this version format dont need it.
+			//mx=mx.multiply(parentM, mx);
 			matrixMap.put(children.getName(), mx);
 			doMatrix(children);
 		}

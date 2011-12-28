@@ -74,8 +74,9 @@ public class AnimationBoneConverter {
 			AnimationBone bone=AnimationUtils.createAnimationBone();
 			bone.setParent(parentIdMaps.get(parent.getName()));
 			bone.setName(children.getName());
-			//TODO support rot
-			mx=mx.multiply(parentMx, mx);
+			
+			//TODO If you wish absolutepath use parent matrix,but this version format dont need it.
+			//mx=mx.multiply(parentMx, mx);
 			
 			Vector3 mxPos=THREE.Vector3();
 			mxPos.setPositionFromMatrix(mx);
