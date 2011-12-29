@@ -21,6 +21,7 @@ public class AnimationDataConverter {
 	
 	private List<String> nameOrderList;
 	
+	private boolean skipFirst=true;
 	public AnimationData convertJsonAnimation(BVH bvh){
 		
 		nameOrderList=new ArrayList<String>();
@@ -69,9 +70,17 @@ public class AnimationDataConverter {
 		double ft=bvh.getFrameTime();
 		data.setName("BVHMotion");
 		data.setFps(30);//noway
-		data.setLength(ft*(bvh.getFrames()-1));
+		int minus=1;
+		if(skipFirst){
+			minus++;
+		}
+		data.setLength(ft*(bvh.getFrames()-minus));
 		//convert each frame
-		for(int i=0;i<bvh.getFrames();i++){	
+		int start=0;
+		if(skipFirst){
+			start=1;
+		}
+		for(int i=start;i<bvh.getFrames();i++){	
 			doPose(bvh,bvh.getFrameAt(i));
 			
 			//create matrix for key
@@ -103,7 +112,11 @@ public class AnimationDataConverter {
 				AnimationKey key=AnimationUtils.createAnimationKey();
 				key.setPos(pos);
 				key.setRot(q);
-				key.setTime(ft*i);
+				int frame=i;
+				if(skipFirst){
+					frame--;
+				}
+				key.setTime(ft*frame);
 				item.getKeys().push(key);
 			}
 		}
