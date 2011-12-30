@@ -102,7 +102,7 @@ public class GWTBVH extends SimpleDemoEntryPoint {
 			return;
 		}*/
 		
-		JsArray<Intersect> intersects=projector.pickIntersects(event.getX(), event.getY(), screenWidth, screenHeight, camera,scene);
+		JsArray<Intersect> intersects=projector.gwtPickIntersects(event.getX(), event.getY(), screenWidth, screenHeight, camera,scene);
 		
 		for(int i=0;i<intersects.length();i++){
 			Intersect sect=intersects.get(i);
