@@ -25,7 +25,8 @@ public static final int ZPOSITION=2;
 public static final int XROTATION=3;
 public static final int YROTATION=4;
 public static final int ZROTATION=5;
-private String order="";
+private String order=""; //TODO merge string
+private String text="";
 public String getOrder() {
 	return order;
 }
@@ -40,6 +41,7 @@ public void addOrder(String ch){
 
 public void setXrotation(boolean xrotation) {
 	Xrotation = xrotation;
+	text+="Xrotation ";
 }
 
 public boolean isYrotation() {
@@ -48,6 +50,7 @@ public boolean isYrotation() {
 
 public void setYrotation(boolean yrotation) {
 	Yrotation = yrotation;
+	text+="Yrotation ";
 }
 
 public boolean isZrotation() {
@@ -56,6 +59,7 @@ public boolean isZrotation() {
 
 public void setZrotation(boolean zrotation) {
 	Zrotation = zrotation;
+	text+="Zrotation ";
 }
 
 public boolean isXposition() {
@@ -64,6 +68,7 @@ public boolean isXposition() {
 
 public void setXposition(boolean xposition) {
 	Xposition = xposition;
+	text+="Xposition ";
 }
 
 public boolean isYposition() {
@@ -72,6 +77,7 @@ public boolean isYposition() {
 
 public void setYposition(boolean yposition) {
 	Yposition = yposition;
+	text+="Yposition ";
 }
 
 public boolean isZposition() {
@@ -80,32 +86,33 @@ public boolean isZposition() {
 
 public void setZposition(boolean zposition) {
 	Zposition = zposition;
+	text+="Zposition ";
 }
 public String toString(){
 	int size=0;
-	String text="";
+	//String text="";
 	if(Xposition){
 		size++;
-		text+="Xpositon ";
+	
 	}
 	if(Yposition){
 		size++;
-		text+="Ypositon ";
+		
 	}
 	if(Zposition){
 		size++;
-		text+="Zpositon ";
+	
 	}if(Xrotation){
 		size++;
-		text+="Xrotation ";
+		
 	}
 	if(Yrotation){
 		size++;
-		text+="Yrotation ";
+		
 	}
 	if(Zrotation){
 		size++;
-		text+="Zrotation ";
+
 	}
 	if(text.isEmpty()){
 		return "CHANNELS 0";

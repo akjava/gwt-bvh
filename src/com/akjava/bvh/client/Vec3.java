@@ -47,6 +47,6 @@ public void setZ(double z) {
 private double y;
 private double z;
 public String toString(){
-	return "("+x+","+y+","+z+")";
+	return "OFFSET "+x+" "+y+" "+z+"";
 }
 }
