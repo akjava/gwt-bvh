@@ -11,10 +11,13 @@ import com.akjava.gwt.three.client.core.Matrix4;
 import com.akjava.gwt.three.client.core.Object3D;
 import com.akjava.gwt.three.client.core.Quaternion;
 import com.akjava.gwt.three.client.core.Vector3;
+import com.akjava.gwt.three.client.gwt.GWTThreeUtils;
+import com.akjava.gwt.three.client.gwt.animation.AnimationBone;
 import com.akjava.gwt.three.client.gwt.animation.AnimationData;
 import com.akjava.gwt.three.client.gwt.animation.AnimationHierarchyItem;
 import com.akjava.gwt.three.client.gwt.animation.AnimationKey;
 import com.akjava.gwt.three.client.gwt.animation.AnimationUtils;
+import com.google.gwt.core.client.JsArray;
 
 public class AnimationDataConverter {
 	
@@ -22,7 +25,15 @@ public class AnimationDataConverter {
 	private List<String> nameOrderList;
 	
 	private boolean skipFirst=true;
-	public AnimationData convertJsonAnimation(BVH bvh){
+	public boolean isSkipFirst() {
+		return skipFirst;
+	}
+
+	public void setSkipFirst(boolean skipFirst) {
+		this.skipFirst = skipFirst;
+	}
+
+	public AnimationData convertJsonAnimation(JsArray<AnimationBone> bones,BVH bvh){
 		
 		nameOrderList=new ArrayList<String>();
 		String oldName=null;
@@ -34,7 +45,11 @@ public class AnimationDataConverter {
 				oldName=newName;
 			}
 		}
-		
+		//maybe same as bone
+		List<Quaternion> boneQ=new ArrayList<Quaternion>();
+		for(int i=0;i<bones.length();i++){
+			boneQ.add(GWTThreeUtils.jsArrayToQuaternion(bones.get(i).getRotq()));
+		}
 		
 		//boneMap = new HashMap<String, Matrix4>();
 		
@@ -109,8 +124,11 @@ public class AnimationDataConverter {
 				Quaternion q=THREE.Quaternion();
 				q.setFromRotationMatrix(matrix);
 				
+				//q.multiplySelf(boneQ.get(j));
+				
+				
 				AnimationKey key=AnimationUtils.createAnimationKey();
-				key.setPos(pos);
+				key.setPos(pos);//key same as bone?
 				key.setRot(q);
 				int frame=i;
 				if(skipFirst){

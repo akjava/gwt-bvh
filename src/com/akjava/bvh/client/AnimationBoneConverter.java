@@ -7,7 +7,9 @@ import java.util.Map;
 
 import com.akjava.gwt.three.client.THREE;
 import com.akjava.gwt.three.client.core.Matrix4;
+import com.akjava.gwt.three.client.core.Quaternion;
 import com.akjava.gwt.three.client.core.Vector3;
+import com.akjava.gwt.three.client.gwt.GWTThreeUtils;
 import com.akjava.gwt.three.client.gwt.animation.AnimationBone;
 import com.akjava.gwt.three.client.gwt.animation.AnimationUtils;
 import com.google.gwt.core.client.GWT;
@@ -52,7 +54,7 @@ public class AnimationBoneConverter {
 		bone.setParent(-1);
 		bone.setName(root.getName());
 		bone.setPos(pos);
-		//TODO support rot
+		//root dont have rot
 		bones.put(root.getName(), bone);
 		
 		
@@ -74,6 +76,11 @@ public class AnimationBoneConverter {
 			AnimationBone bone=AnimationUtils.createAnimationBone();
 			bone.setParent(parentIdMaps.get(parent.getName()));
 			bone.setName(children.getName());
+			
+			//bone rot
+			Vector3 rot=GWTThreeUtils.getRotation(THREE.Vector3(), pos);
+			//value not good as expected,TODO fix
+			//bone.setRotq(GWTThreeUtils.rotationQuaternion(rot));
 			
 			//TODO If you wish absolutepath use parent matrix,but this version format dont need it.
 			//mx=mx.multiply(parentMx, mx);
