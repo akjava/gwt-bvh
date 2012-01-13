@@ -22,8 +22,10 @@ import java.util.List;
 
 public class BVH {
 private BVHNode hiearchy;
-private Motion motion;
+private BVHMotion motion;
 private int skips=1;
+
+public static final double FPS_30=0.033;
 public int getSkips() {
 	return skips;
 }
@@ -32,11 +34,11 @@ public void setSkips(int skips) {
 	this.skips = skips;
 }
 
-public Motion getMotion() {
+public BVHMotion getMotion() {
 	return motion;
 }
 
-public void setMotion(Motion motion) {
+public void setMotion(BVHMotion motion) {
 	this.motion = motion;
 }
 

@@ -253,7 +253,7 @@ public class BVHParser {
 			break;
 		case EXPECT_MOTION:
 			if(line.equals("MOTION")){
-				Motion motion=new Motion();
+				BVHMotion motion=new BVHMotion();
 				bvh.setMotion(motion);
 				mode=EXPECT_MOTION_FRAMES;
 			}else{

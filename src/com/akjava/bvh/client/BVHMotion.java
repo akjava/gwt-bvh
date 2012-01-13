@@ -19,7 +19,7 @@ package com.akjava.bvh.client;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Motion {
+public class BVHMotion {
 private int frames;
 private double frameTime;
 public int getFrames() {

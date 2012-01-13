@@ -1,5 +1,7 @@
 package com.akjava.bvh.client;
 
+import com.akjava.gwt.lib.client.LogUtils;
+
 public class BVHWriter {
 
 	public String writeToString(BVH bvh){
@@ -13,7 +15,7 @@ public class BVHWriter {
 		buffer.append("MOTION"+"\n");
 		buffer.append("Frames: "+frames+"\n");
 		buffer.append("Frame Time: "+bvh.getFrameTime()+"\n");
-		
+
 		for(int i=0;i<frames;i++){
 			double[] values=bvh.getFrameAt(i);
 			String v="";

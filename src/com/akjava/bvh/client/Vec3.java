@@ -49,4 +49,13 @@ private double z;
 public String toString(){
 	return "OFFSET "+x+" "+y+" "+z+"";
 }
+public Vec3 multiplyScalar(double v){
+	this.x*=v;
+	this.y*=v;
+	this.z*=v;
+	return this;
+}
+public Vec3 clone(){
+	return new Vec3(this.x,this.y,this.z);
+}
 }
