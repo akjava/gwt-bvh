@@ -41,6 +41,7 @@ import com.akjava.gwt.html5.client.file.File;
 import com.akjava.gwt.html5.client.file.FileHandler;
 import com.akjava.gwt.html5.client.file.FileReader;
 import com.akjava.gwt.html5.client.file.FileUtils;
+import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.lib.client.widget.cell.util.Benchmark;
 import com.akjava.gwt.three.client.THREE;
 import com.akjava.gwt.three.client.core.Geometry;
@@ -761,7 +762,7 @@ Timer timer=new Timer(){
 		currentFrameRange.setMax(bvh.getFrames()-1);
 		//update labels
 	}
-	
+	private JsArray<File> lastSelectedFiles;
 	@Override
 	public void createControl(Panel parent) {
 		
@@ -777,18 +778,20 @@ Timer timer=new Timer(){
 		
 		file.addChangeHandler(new ChangeHandler() {
 			
+			
+
 			@Override
 			public void onChange(ChangeEvent event) {
 				//Benchmark.start("load");
 				
-				JsArray<File> files=FileUtils.toFile(event.getNativeEvent());
+				lastSelectedFiles = FileUtils.toFile(event.getNativeEvent());
 				
-				for(int i=0;i<files.length();i++){
-					bvhFileList.add(files.get(i));
+				for(int i=0;i<lastSelectedFiles.length();i++){
+					bvhFileList.add(lastSelectedFiles.get(i));
 				}
 				
 				dataListCell.setDatas(bvhFileList);
-				dataListCell.setSelection(files.get(0));
+				dataListCell.setSelection(lastSelectedFiles.get(0));
 				//bvhCellList.setRowCount(bvhFileList.size(), true);
 				//bvhCellList.setRowData(bvhFileList);
 				
@@ -948,6 +951,18 @@ Timer timer=new Timer(){
 		});
 		dataControls.add(removeAll);
 		
+		Button reload=new Button("Reload");
+		reload.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				
+				doReload();
+				
+			}
+		});
+		dataControls.add(reload);
+		
 		
 		
 		drawMesh = new CheckBox("Draw Body Mesh");
@@ -1073,6 +1088,20 @@ Timer timer=new Timer(){
 		
 		createBottomPanel();
 		showControl();
+	}
+
+	protected void doReload() {
+		LogUtils.log(lastSelectedFiles);
+		if(lastSelectedFiles==null){
+			return;
+		}
+		//bvhFileList.clear();
+		for(int i=0;i<lastSelectedFiles.length();i++){
+			bvhFileList.add(lastSelectedFiles.get(i));
+		}
+		
+		dataListCell.setDatas(bvhFileList);
+		dataListCell.setSelection(lastSelectedFiles.get(0));
 	}
 
 	protected void doChangeVisibleBodyMesh() {
