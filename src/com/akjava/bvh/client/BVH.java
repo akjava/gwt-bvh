@@ -38,6 +38,7 @@ public BVHMotion getMotion() {
 	return motion;
 }
 
+
 public void setMotion(BVHMotion motion) {
 	this.motion = motion;
 }

@@ -31,6 +31,10 @@ public double[] getFrameAt(int index){
 public void setFrames(int frames) {
 	this.frames = frames;
 }
+public void syncFrames(){
+	setFrames(motions.size());
+}
+
 public double getFrameTime() {
 	return frameTime;
 }
