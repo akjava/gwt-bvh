@@ -25,6 +25,9 @@ private double frameTime;
 public int getFrames() {
 	return frames;
 }
+public double[] getFrameAt(int index){
+	return motions.get(index);
+}
 public void setFrames(int frames) {
 	this.frames = frames;
 }

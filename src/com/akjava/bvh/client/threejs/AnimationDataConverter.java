@@ -1,10 +1,14 @@
-package com.akjava.bvh.client;
+package com.akjava.bvh.client.threejs;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.akjava.bvh.client.BVH;
+import com.akjava.bvh.client.BVHNode;
+import com.akjava.bvh.client.Channels;
+import com.akjava.bvh.client.NameAndChannel;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.THREE;
 import com.akjava.gwt.three.client.core.Matrix4;

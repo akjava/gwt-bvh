@@ -1,8 +1,9 @@
-package com.akjava.bvh.client;
+package com.akjava.bvh.client.threejs;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import com.akjava.bvh.client.Vec3;
 import com.akjava.gwt.three.client.THREE;
 import com.akjava.gwt.three.client.core.Matrix4;
 import com.akjava.gwt.three.client.core.Vector3;
