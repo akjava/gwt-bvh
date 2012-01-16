@@ -79,10 +79,9 @@ public class BVHParser {
 	
 	public  BVH parse(String text) throws InvalidLineException{
 		initialize();
-		Benchmark.start("split");
 		text=text.replace("\r", "");
-		String lines[]=text.split("\n");
-		//LogUtils.log("splited:"+Benchmark.end("load"));
+		
+		String lines[]=LineSplitter.splitLineAsArray(text);
 		parseLines(lines);
 		
 		validate();
