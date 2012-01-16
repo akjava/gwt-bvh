@@ -61,11 +61,11 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
-import com.google.gwt.event.dom.client.MouseOutEvent;
 import com.google.gwt.event.dom.client.MouseUpEvent;
 import com.google.gwt.event.dom.client.MouseUpHandler;
+import com.google.gwt.event.logical.shared.AttachEvent;
+import com.google.gwt.event.logical.shared.AttachEvent.Handler;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -457,7 +457,6 @@ public void onError(Request request, Throwable exception) {
 		}
 		boneRoot=null;
 		bvh=null;
-		
 	}
 	private void parseBVH(String bvhText){
 		final BVHParser parser=new BVHParser();
@@ -774,6 +773,8 @@ Timer timer=new Timer(){
 		
 		file.setHeight("50px");
 		file.getElement().setAttribute("multiple", "multiple");
+		
+		
 		file.addChangeHandler(new ChangeHandler() {
 			
 			@Override
@@ -810,6 +811,7 @@ Timer timer=new Timer(){
 				});
 				reader.readAsText(files.get(0),"utf-8");
 				*/
+				
 			}
 		});
 		parent.add(file);
