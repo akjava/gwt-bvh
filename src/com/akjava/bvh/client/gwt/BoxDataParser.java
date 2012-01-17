@@ -1,4 +1,4 @@
-package com.akjava.gwt.bvh.client;
+package com.akjava.bvh.client.gwt;
 
 import java.util.HashMap;
 import java.util.Map;

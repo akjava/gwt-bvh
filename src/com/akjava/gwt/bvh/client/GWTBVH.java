@@ -27,6 +27,8 @@ import com.akjava.bvh.client.BVH;
 import com.akjava.bvh.client.BVHNode;
 import com.akjava.bvh.client.BVHParser;
 import com.akjava.bvh.client.BVHParser.ParserListener;
+import com.akjava.bvh.client.gwt.BoxData;
+import com.akjava.bvh.client.gwt.BoxDataParser;
 import com.akjava.bvh.client.Channels;
 import com.akjava.bvh.client.NameAndChannel;
 import com.akjava.bvh.client.Vec3;
@@ -52,7 +54,7 @@ import com.akjava.gwt.three.client.core.Projector;
 import com.akjava.gwt.three.client.core.Vector3;
 import com.akjava.gwt.three.client.gwt.Clock;
 import com.akjava.gwt.three.client.gwt.Object3DUtils;
-import com.akjava.gwt.three.client.gwt.SimpleDemoEntryPoint;
+
 import com.akjava.gwt.three.client.lights.Light;
 import com.akjava.gwt.three.client.objects.Mesh;
 import com.akjava.gwt.three.client.renderers.WebGLRenderer;

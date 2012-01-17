@@ -90,6 +90,18 @@ public double[] getFrameAt(int index){
 	}
 }
 
+public List<BVHNode> getNodeList(){
+	List<BVHNode> nodes=new ArrayList<BVHNode>();
+	addNode(nodes,getHiearchy());
+	return nodes;
+}
+private void addNode(List<BVHNode> nodes,BVHNode node){
+	nodes.add(node);
+	for(BVHNode child:node.getJoints()){
+		child.setParentName(node.getName());
+		addNode(nodes,child);
+	}
+}
 
 
 }

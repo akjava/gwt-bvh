@@ -56,4 +56,13 @@ public List<BVHNode> getJoints() {
 public void add(BVHNode joint){
 	joints.add(joint);
 }
+
+//usually null for special purpose
+private String parentName;
+public String getParentName() {
+	return parentName;
+}
+public void setParentName(String parentName) {
+	this.parentName = parentName;
+}
 }
