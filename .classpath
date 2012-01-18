@@ -4,9 +4,9 @@
 	<classpathentry kind="src" output="test-classes" path="test"/>
 	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/akjavastatgwt_111216.jar"/>
 	<classpathentry kind="lib" path="lib/akjavahtml5gwt_111226.jar"/>
-	<classpathentry kind="lib" path="lib/akjavalibgwt_111226.jar"/>
-	<classpathentry kind="lib" path="lib/akjavathreegwt_111226.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/threeTest"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/GWTLib2011"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/stats-gwt"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>
