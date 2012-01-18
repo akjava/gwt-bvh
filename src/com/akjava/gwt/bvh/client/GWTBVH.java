@@ -27,11 +27,11 @@ import com.akjava.bvh.client.BVH;
 import com.akjava.bvh.client.BVHNode;
 import com.akjava.bvh.client.BVHParser;
 import com.akjava.bvh.client.BVHParser.ParserListener;
-import com.akjava.bvh.client.gwt.BoxData;
-import com.akjava.bvh.client.gwt.BoxDataParser;
 import com.akjava.bvh.client.Channels;
 import com.akjava.bvh.client.NameAndChannel;
 import com.akjava.bvh.client.Vec3;
+import com.akjava.bvh.client.gwt.BoxData;
+import com.akjava.bvh.client.gwt.BoxDataParser;
 import com.akjava.gwt.bvh.client.list.BVHFileWidget;
 import com.akjava.gwt.bvh.client.list.DataListCell;
 import com.akjava.gwt.bvh.client.list.DataListCell.ChangeSelectionListener;
@@ -45,6 +45,7 @@ import com.akjava.gwt.html5.client.file.FileReader;
 import com.akjava.gwt.html5.client.file.FileUtils;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.lib.client.widget.cell.util.Benchmark;
+import com.akjava.gwt.stats.client.Stats;
 import com.akjava.gwt.three.client.THREE;
 import com.akjava.gwt.three.client.core.Geometry;
 import com.akjava.gwt.three.client.core.Intersect;
@@ -54,7 +55,6 @@ import com.akjava.gwt.three.client.core.Projector;
 import com.akjava.gwt.three.client.core.Vector3;
 import com.akjava.gwt.three.client.gwt.Clock;
 import com.akjava.gwt.three.client.gwt.Object3DUtils;
-
 import com.akjava.gwt.three.client.lights.Light;
 import com.akjava.gwt.three.client.objects.Mesh;
 import com.akjava.gwt.three.client.renderers.WebGLRenderer;
@@ -67,8 +67,8 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
 import com.google.gwt.event.dom.client.MouseUpEvent;
 import com.google.gwt.event.dom.client.MouseUpHandler;
-import com.google.gwt.event.logical.shared.AttachEvent;
-import com.google.gwt.event.logical.shared.AttachEvent.Handler;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -222,6 +222,24 @@ public class GWTBVH extends SimpleDemoEntryPoint {
 		}
 		*/
 	//	ctime=System.currentTimeMillis();
+		
+		tabPanel.addSelectionHandler(new SelectionHandler<Integer>() {
+			
+			@Override
+			public void onSelection(SelectionEvent<Integer> event) {
+				int selection=event.getSelectedItem();
+				if(selection==0){
+					stats.setVisible(true);
+					showControl();
+					dialog2.setVisible(true);
+				}else{
+				stats.setVisible(false);
+				hideControl();
+				dialog2.setVisible(false);
+				}
+			}
+		});
+		tabPanel.add(new Label("hello"),"hello");
 	}
 	
 	private void doZYX(Object3D target,String lastOrder){
@@ -1270,6 +1288,11 @@ Timer timer=new Timer(){
 	@Override
 	public String getHtml(){
 		return super.getHtml()+". Sample BVH File from <a href='https://sites.google.com/a/cgspeed.com/cgspeed/motion-capture/cmu-bvh-conversion'>CMU Graphics Lab Motion Capture Database.</a><br/> More Infomation click <a href='http://webgl.akjava.com'>webgl.akjava.com</a>";
+	}
+
+	@Override
+	public String getTabTitle() {
+		return "BVH M-Creator";
 	}
 
 

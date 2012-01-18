@@ -1,5 +1,6 @@
 package com.akjava.gwt.bvh.client;
 
+import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.stats.client.Stats;
 import com.akjava.gwt.three.client.THREE;
 import com.akjava.gwt.three.client.renderers.WebGLRenderer;
@@ -22,6 +23,8 @@ import com.google.gwt.event.dom.client.MouseWheelEvent;
 import com.google.gwt.event.dom.client.MouseWheelHandler;
 import com.google.gwt.event.logical.shared.ResizeEvent;
 import com.google.gwt.event.logical.shared.ResizeHandler;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
@@ -57,13 +60,21 @@ public abstract class TabDemoEntryPoint implements EntryPoint {
 
 
 
-	private Button hide;
+	private Button hideButton;
 
 
 
 	private VerticalPanel main;
 	
 	protected int canvasWidth,canvasHeight;
+
+
+
+	protected TabLayoutPanel tabPanel;
+
+
+
+	protected PopupPanel dialog2;
 	public WebGLCanvas getCanvas() {
 		return canvas;
 	}
@@ -78,7 +89,8 @@ public abstract class TabDemoEntryPoint implements EntryPoint {
 	public abstract void resized(int width,int height);
 	public void onModuleLoad() {
 		int tabHeight=30;
-		TabLayoutPanel tabPanel=new TabLayoutPanel(tabHeight, Unit.PX);
+		tabPanel = new TabLayoutPanel(tabHeight, Unit.PX);
+		
 		RootLayoutPanel.get().add(tabPanel);
 		
 		int width=Window.getClientWidth();
@@ -160,7 +172,7 @@ public abstract class TabDemoEntryPoint implements EntryPoint {
 		canvas.setWidth("100%");
 		canvas.setHeight("100%");
 		
-		tabPanel.add(canvas,"Player");
+		tabPanel.add(canvas,getTabTitle());
 		//tabPanel.add(new Label("hello"),"test");
 		//RootLayoutPanel.get().add(canvas);
 		
@@ -169,6 +181,7 @@ public abstract class TabDemoEntryPoint implements EntryPoint {
 		initialize(renderer,width,height);
 		
 		stats = Stats.insertStatsToRootPanel();
+		stats.setPosition(0, 30);//for tab header
 		timer = new Timer(){
 			public void run(){
 				update(renderer);
@@ -202,19 +215,19 @@ public abstract class TabDemoEntryPoint implements EntryPoint {
 		hPanel.setWidth("100%");
 		hPanel.setHorizontalAlignment(HorizontalPanel.ALIGN_RIGHT);
 		dialogRoot.add(hPanel);
-		hide = new Button("Hide Control");
+		hideButton = new Button("Hide Control");
 		
-		hide.setVisible(false);
-		hide.addClickHandler(new ClickHandler() {
+		hideButton.setVisible(false);
+		hideButton.addClickHandler(new ClickHandler() {
 			
 			@Override
 			public void onClick(ClickEvent event) {
 				main.setVisible(false);
-				hide.setVisible(false);
+				hideButton.setVisible(false);
 				rightTop(dialog);
 			}
 		});
-		hPanel.add(hide);
+		hPanel.add(hideButton);
 		
 		dialogRoot.add(main);
 		
@@ -247,9 +260,9 @@ public abstract class TabDemoEntryPoint implements EntryPoint {
 		html.setWidth("100%");
 		html.setHeight("20px");
 		html.setStyleName("text");
-		final PopupPanel dialog2=new PopupPanel();
+		dialog2 = new PopupPanel();
 		dialog2.add(html);
-		dialog2.setPopupPosition(150, 0);
+		dialog2.setPopupPosition(150, 30);
 		dialog2.setWidth("100%");
 		dialog2.setStyleName("transparent");
 		dialog2.show();
@@ -258,14 +271,22 @@ public abstract class TabDemoEntryPoint implements EntryPoint {
 	
 	protected void showControl(){
 		main.setVisible(true);
-		hide.setVisible(true);
+		hideButton.setVisible(true);
 		rightTop(dialog);
+	}
+	
+	protected void hideControl(){
+		main.setVisible(false);
+		hideButton.setVisible(false);
+		
 	}
 	
 	public String getHtml(){
 		return "Powerd by <a href='https://github.com/mrdoob/three.js/'>Three.js</a> & <a href='http://code.google.com/intl/en/webtoolkit/'>GWT</a>";
 	}
 	public abstract void createControl(Panel parent);
+	
+	public abstract String getTabTitle();
 	
 	private void rightTop(PopupPanel dialog){
 		int w=Window.getClientWidth();
