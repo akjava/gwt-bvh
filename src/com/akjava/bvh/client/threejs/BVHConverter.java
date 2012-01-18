@@ -40,14 +40,14 @@ public class BVHConverter {
 	
 	public double[] matrixsToMotion(List<Matrix4> matrixs,int mode,String order){
 		
-		List<Double> bytes=new ArrayList<Double>();
+		List<Double> values=new ArrayList<Double>();
 		for(int i=0;i<matrixs.size();i++){
 			Matrix4 mx=matrixs.get(i);
 			if((i==0 && mode==ROOT_POSITION_ROTATE_ONLY) || mode==POSITION_ROTATE){
 				Vector3 pos=GWTThreeUtils.toPositionVec(mx);
-				bytes.add(pos.getX());
-				bytes.add(pos.getY());
-				bytes.add(pos.getZ());
+				values.add(pos.getX());
+				values.add(pos.getY());
+				values.add(pos.getZ());
 			}
 			Vector3 tmprot=GWTThreeUtils.rotationToVector3(mx);
 			//TODO order convert;
@@ -55,17 +55,17 @@ public class BVHConverter {
 				LogUtils.log("Warning:only support-XYZ");
 			}
 			Vector3 rotDegree=GWTThreeUtils.radiantToDegree(tmprot);
-			bytes.add(rotDegree.getX());
-			bytes.add(rotDegree.getY());
-			bytes.add(rotDegree.getZ());
+			values.add(rotDegree.getX());
+			values.add(rotDegree.getY());
+			values.add(rotDegree.getZ());
 		}
 		
 		
 		
 		
-		double[] bt=new double[bytes.size()];
-		for(int i=0;i<bytes.size();i++){
-			bt[i]=bytes.get(i).byteValue();
+		double[] bt=new double[values.size()];
+		for(int i=0;i<values.size();i++){
+			bt[i]=values.get(i).doubleValue();
 		}
 		return bt;
 	}
