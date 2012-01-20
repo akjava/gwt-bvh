@@ -1,10 +1,7 @@
-GWT BVH Motion Format Player
+GWT BVH Motion Format Library
 lib-bvh for java/gwt
-tested only CMU Graphics Lab Motion Capture Database bvh files.
 
-included BVH files from CMU Graphics Lab Motion Capture Database
-https://sites.google.com/a/cgspeed.com/cgspeed/motion-capture/cmu-bvh-conversion
+now has only libbvh
+https://github.com/akjava/BVH-Motion-Creator
 
----
-Bugs
-Only Tested on Chrome
+Player move to GWT BVH Motion Creator
