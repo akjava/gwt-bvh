@@ -62,6 +62,7 @@ public class AnimationDataConverter {
 		parentIdMaps=new HashMap<String,Integer>();
 		jointMap=new HashMap<String,Object3D>();
 		matrixMap=new HashMap<String,Matrix4>();
+		angleMap=new HashMap<String,Vector3>();
 		for(int i=0;i<nameOrderList.size();i++){
 			parentIdMaps.put(nameOrderList.get(i), i);
 			jointMap.put(nameOrderList.get(i), THREE.Object3D());
@@ -100,10 +101,12 @@ public class AnimationDataConverter {
 			start=1;
 		}
 		for(int i=start;i<bvh.getFrames();i++){	
+			//get each joint rotation to object3
 			doPose(bvh,bvh.getFrameAt(i));
 			
 			//create matrix for key
 			matrixMap.clear();
+			angleMap.clear();
 			BVHNode rootNode=bvh.getHiearchy();
 			Object3D o3d=jointMap.get(rootNode.getName());
 			Matrix4 mx=THREE.Matrix4();
@@ -115,7 +118,7 @@ public class AnimationDataConverter {
 			mx.setRotationFromEuler(o3d.getRotation(), "XYZ");
 			//mx.multiply(nodeToMatrix(rootNode), mx);
 			matrixMap.put(rootNode.getName(), mx);
-			
+			angleMap.put(rootNode.getName(), GWTThreeUtils.radiantToDegree(o3d.getRotation()));
 			doMatrix(rootNode);
 			
 			for(int j=0;j<nameOrderList.size();j++){
@@ -134,6 +137,7 @@ public class AnimationDataConverter {
 				AnimationKey key=AnimationUtils.createAnimationKey();
 				key.setPos(pos);//key same as bone?
 				key.setRot(q);
+				key.setAngle(angleMap.get(nameOrderList.get(j)));
 				int frame=i;
 				if(skipFirst){
 					frame--;
@@ -172,6 +176,7 @@ public class AnimationDataConverter {
 			doMatrix(children);
 		}
 	}
+	private Map<String,Vector3> angleMap;
 	private Map<String,Matrix4> matrixMap;
 	private Map<String,Object3D> jointMap;
 	private Map<String,Integer> parentIdMaps;

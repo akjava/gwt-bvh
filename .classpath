@@ -7,6 +7,6 @@
 	<classpathentry kind="lib" path="lib/akjavahtml5gwt_120118.jar"/>
 	<classpathentry kind="lib" path="lib/akjavalibgwt_120118.jar"/>
 	<classpathentry kind="lib" path="lib/akjavastatgwt_120118.jar"/>
-	<classpathentry kind="lib" path="lib/akjavathreegwt_120118.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/threeTest"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>
