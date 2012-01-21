@@ -173,6 +173,7 @@ public class AnimationDataConverter {
 			//TODO If you wish absolutepath use parent matrix,but this version format dont need it.
 			//mx=mx.multiply(parentM, mx);
 			matrixMap.put(children.getName(), mx);
+			angleMap.put(children.getName(), GWTThreeUtils.radiantToDegree(o3d.getRotation()));
 			doMatrix(children);
 		}
 	}
