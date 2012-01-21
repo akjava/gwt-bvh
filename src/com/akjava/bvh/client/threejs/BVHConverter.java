@@ -55,10 +55,17 @@ public double[] angleAndMatrixsToMotion(List<AngleAndMatrix> matrixs,int mode,St
 			if(!order.equals("XYZ")){
 				LogUtils.log("Warning:only support-XYZ");
 			}
+			//rot has problem
+			/*
 			Vector3 rotDegree=GWTThreeUtils.radiantToDegree(tmprot);
 			values.add(rotDegree.getX());
 			values.add(rotDegree.getY());
 			values.add(rotDegree.getZ());
+			*/
+			Vector3 angle=matrixs.get(i).getAngle();
+			values.add(angle.getX());
+			values.add(angle.getY());
+			values.add(angle.getZ());
 		}
 		
 		
