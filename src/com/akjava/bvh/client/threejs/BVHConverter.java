@@ -10,6 +10,7 @@ import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.core.Matrix4;
 import com.akjava.gwt.three.client.core.Vector3;
 import com.akjava.gwt.three.client.gwt.GWTThreeUtils;
+import com.akjava.gwt.three.client.gwt.animation.AngleAndMatrix;
 import com.akjava.gwt.three.client.gwt.animation.AnimationBone;
 import com.google.gwt.core.client.JsArray;
 
@@ -38,6 +39,45 @@ public class BVHConverter {
 		return bvhs.get(0);
 	}
 	
+public double[] angleAndMatrixsToMotion(List<AngleAndMatrix> matrixs,int mode,String order){
+		
+		List<Double> values=new ArrayList<Double>();
+		for(int i=0;i<matrixs.size();i++){
+			Matrix4 mx=matrixs.get(i).getMatrix();//TODO change angle
+			if((i==0 && mode==ROOT_POSITION_ROTATE_ONLY) || mode==POSITION_ROTATE){
+				Vector3 pos=GWTThreeUtils.toPositionVec(mx);
+				values.add(pos.getX());
+				values.add(pos.getY());
+				values.add(pos.getZ());
+			}
+			Vector3 tmprot=GWTThreeUtils.rotationToVector3(mx);
+			//TODO order convert;
+			if(!order.equals("XYZ")){
+				LogUtils.log("Warning:only support-XYZ");
+			}
+			Vector3 rotDegree=GWTThreeUtils.radiantToDegree(tmprot);
+			values.add(rotDegree.getX());
+			values.add(rotDegree.getY());
+			values.add(rotDegree.getZ());
+		}
+		
+		
+		
+		
+		double[] bt=new double[values.size()];
+		for(int i=0;i<values.size();i++){
+			bt[i]=values.get(i).doubleValue();
+		}
+		return bt;
+	}
+	/**
+	 * bugs cant handle over 90 angle
+	 * @deprecated
+	 * @param matrixs
+	 * @param mode
+	 * @param order
+	 * @return
+	 */
 	public double[] matrixsToMotion(List<Matrix4> matrixs,int mode,String order){
 		
 		List<Double> values=new ArrayList<Double>();
