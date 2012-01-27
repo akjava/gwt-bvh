@@ -10,7 +10,7 @@ import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.core.Matrix4;
 import com.akjava.gwt.three.client.core.Vector3;
 import com.akjava.gwt.three.client.gwt.GWTThreeUtils;
-import com.akjava.gwt.three.client.gwt.animation.AngleAndMatrix;
+import com.akjava.gwt.three.client.gwt.animation.AngleAndPosition;
 import com.akjava.gwt.three.client.gwt.animation.AnimationBone;
 import com.google.gwt.core.client.JsArray;
 
@@ -39,7 +39,7 @@ public class BVHConverter {
 		return bvhs.get(0);
 	}
 	
-public double[] angleAndMatrixsToMotion(List<AngleAndMatrix> matrixs,int mode,String order){
+public double[] angleAndMatrixsToMotion(List<AngleAndPosition> matrixs,int mode,String order){
 		
 		List<Double> values=new ArrayList<Double>();
 		for(int i=0;i<matrixs.size();i++){

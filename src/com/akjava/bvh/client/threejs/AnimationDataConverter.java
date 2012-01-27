@@ -16,6 +16,7 @@ import com.akjava.gwt.three.client.core.Object3D;
 import com.akjava.gwt.three.client.core.Quaternion;
 import com.akjava.gwt.three.client.core.Vector3;
 import com.akjava.gwt.three.client.gwt.GWTThreeUtils;
+import com.akjava.gwt.three.client.gwt.ThreeLog;
 import com.akjava.gwt.three.client.gwt.animation.AnimationBone;
 import com.akjava.gwt.three.client.gwt.animation.AnimationData;
 import com.akjava.gwt.three.client.gwt.animation.AnimationHierarchyItem;
@@ -25,7 +26,7 @@ import com.google.gwt.core.client.JsArray;
 
 public class AnimationDataConverter {
 	
-	
+	//list of bone names
 	private List<String> nameOrderList;
 	
 	private boolean skipFirst=true;
@@ -39,6 +40,7 @@ public class AnimationDataConverter {
 
 	public AnimationData convertJsonAnimation(JsArray<AnimationBone> bones,BVH bvh){
 		
+		//maybe same as <AnimationBone>
 		nameOrderList=new ArrayList<String>();
 		String oldName=null;
 		for(int i=0;i<bvh.getNameAndChannels().size();i++){
@@ -49,11 +51,13 @@ public class AnimationDataConverter {
 				oldName=newName;
 			}
 		}
-		//maybe same as bone
+		
+		/*
 		List<Quaternion> boneQ=new ArrayList<Quaternion>();
 		for(int i=0;i<bones.length();i++){
 			boneQ.add(GWTThreeUtils.jsArrayToQuaternion(bones.get(i).getRotq()));
 		}
+		*/
 		
 		//boneMap = new HashMap<String, Matrix4>();
 		
@@ -76,6 +80,7 @@ public class AnimationDataConverter {
 		
 		hmap.put(root.getName(), rootItem);
 		convert(hmap,root);
+		
 		//List<AnimationHierarchyItem> aList=new ArrayList<AnimationHierarchyItem>();
 		
 		//IdNames=new HashMap<Integer,String>();
@@ -89,7 +94,7 @@ public class AnimationDataConverter {
 		
 		double ft=bvh.getFrameTime();
 		data.setName("BVHMotion");
-		data.setFps(30);//noway
+		data.setFps(30);//TODO change
 		int minus=1;
 		if(skipFirst){
 			minus++;
@@ -164,6 +169,7 @@ public class AnimationDataConverter {
 			Matrix4 mx=THREE.Matrix4();
 			Vector3 mpos=THREE.Vector3();
 			mpos.add(o3d.getPosition(), BVHUtils.toVector3(children.getOffset()));
+			//LogUtils.log("doMatrix:"+children.getName()+",o3d="+ThreeLog.get(o3d.getPosition())+",childoffset="+children.getOffset());
 			mx.setPosition(mpos);
 			mx.setRotationFromEuler(o3d.getRotation(), "XYZ");
 			//mx=mx.multiply(nodeToMatrix(children), mx);
