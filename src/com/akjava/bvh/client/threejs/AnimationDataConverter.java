@@ -84,7 +84,7 @@ public class AnimationDataConverter {
 		//List<AnimationHierarchyItem> aList=new ArrayList<AnimationHierarchyItem>();
 		
 		//IdNames=new HashMap<Integer,String>();
-		LogUtils.log("nc:"+nameOrderList.size());
+		//LogUtils.log("nc:"+nameOrderList.size());
 		for(int i=0;i<nameOrderList.size();i++){
 			AnimationHierarchyItem abone=hmap.get(nameOrderList.get(i));
 			data.getHierarchy().push(abone);
