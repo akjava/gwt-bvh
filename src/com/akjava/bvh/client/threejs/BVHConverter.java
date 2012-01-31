@@ -21,6 +21,9 @@ public class BVHConverter {
 		for(int i=0;i<bones.length();i++){
 			AnimationBone bone=bones.get(i);
 			BVHNode node=boneToBVHNode(bone);
+			if(i==0){
+				node.setOffset(new Vec3(0,0,0));//i think it's better
+			}
 			bvhs.add(node);
 			//add parent
 			if(bone.getParent()!=-1){
@@ -123,7 +126,10 @@ public double[] angleAndMatrixsToMotion(List<AngleAndPosition> matrixs,int mode,
 		bvhNode.setName(bone.getName());
 		Vec3 pos=new Vec3(bone.getPos().get(0),bone.getPos().get(1),bone.getPos().get(2));
 		bvhNode.setOffset(pos);
-		//problem no angle
+		
+		/*
+		 * maybe igreno angle is better?
+		 */
 		
 		//no channels
 		return bvhNode;

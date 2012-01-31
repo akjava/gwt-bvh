@@ -38,8 +38,20 @@ public class AnimationDataConverter {
 		this.skipFirst = skipFirst;
 	}
 
+	
+	//dont use bone
 	public AnimationData convertJsonAnimation(JsArray<AnimationBone> bones,BVH bvh){
-		
+		//TODO check rotate and move
+		return convertJsonAnimation(new BVHConverter().convertBVHNode(bones),bvh);
+	}
+	
+	
+	public AnimationData convertJsonAnimation(BVH bvh){
+		return convertJsonAnimation(bvh.getHiearchy(),bvh);
+	}
+	
+	
+	public AnimationData convertJsonAnimation(BVHNode rootNode,BVH bvh){
 		//maybe same as <AnimationBone>
 		nameOrderList=new ArrayList<String>();
 		String oldName=null;
@@ -74,12 +86,12 @@ public class AnimationDataConverter {
 		
 		//create hierarchy
 		Map<String,AnimationHierarchyItem> hmap=new HashMap<String,AnimationHierarchyItem>();
-		BVHNode root=bvh.getHiearchy();
+		
 		AnimationHierarchyItem rootItem=AnimationUtils.createAnimationHierarchyItem();
 		rootItem.setParent(-1);
 		
-		hmap.put(root.getName(), rootItem);
-		convert(hmap,root);
+		hmap.put(rootNode.getName(), rootItem);
+		convert(hmap,rootNode);
 		
 		//List<AnimationHierarchyItem> aList=new ArrayList<AnimationHierarchyItem>();
 		
@@ -112,7 +124,7 @@ public class AnimationDataConverter {
 			//create matrix for key
 			matrixMap.clear();
 			angleMap.clear();
-			BVHNode rootNode=bvh.getHiearchy();
+			//BVHNode rootNode=bvh.getHiearchy();
 			Object3D o3d=jointMap.get(rootNode.getName());
 			Matrix4 mx=THREE.Matrix4();
 			
@@ -141,7 +153,7 @@ public class AnimationDataConverter {
 				
 				AnimationKey key=AnimationUtils.createAnimationKey();
 				key.setPos(pos);//key same as bone?
-				key.setRot(q);
+				key.setRot(GWTThreeUtils.quaternionToJsArray(q));
 				key.setAngle(angleMap.get(nameOrderList.get(j)));
 				int frame=i;
 				if(skipFirst){
