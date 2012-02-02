@@ -1,4 +1,4 @@
-package com.akjava.bvh.client.gwt;
+package com.akjava.gwt.bvh.client;
 
 public class BoxData {
 private String name;

@@ -1,4 +1,4 @@
-package com.akjava.bvh.client.threejs;
+package com.akjava.gwt.bvh.client.threejs;
 
 import java.util.HashMap;
 import java.util.Map;

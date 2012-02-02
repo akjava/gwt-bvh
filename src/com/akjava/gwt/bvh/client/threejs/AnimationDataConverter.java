@@ -1,4 +1,4 @@
-package com.akjava.bvh.client.threejs;
+package com.akjava.gwt.bvh.client.threejs;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,13 +16,13 @@ import com.akjava.gwt.three.client.core.Object3D;
 import com.akjava.gwt.three.client.core.Quaternion;
 import com.akjava.gwt.three.client.core.Vector3;
 import com.akjava.gwt.three.client.gwt.GWTThreeUtils;
-import com.akjava.gwt.three.client.gwt.ThreeLog;
 import com.akjava.gwt.three.client.gwt.animation.AnimationBone;
 import com.akjava.gwt.three.client.gwt.animation.AnimationData;
 import com.akjava.gwt.three.client.gwt.animation.AnimationHierarchyItem;
 import com.akjava.gwt.three.client.gwt.animation.AnimationKey;
 import com.akjava.gwt.three.client.gwt.animation.AnimationUtils;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayNumber;
 
 public class AnimationDataConverter {
 	
@@ -39,15 +39,178 @@ public class AnimationDataConverter {
 	}
 
 	
-	//dont use bone
-	public AnimationData convertJsonAnimation(JsArray<AnimationBone> bones,BVH bvh){
-		//TODO check rotate and move
-		return convertJsonAnimation(new BVHConverter().convertBVHNode(bones),bvh);
-	}
+	
 	
 	
 	public AnimationData convertJsonAnimation(BVH bvh){
 		return convertJsonAnimation(bvh.getHiearchy(),bvh);
+	}
+	
+	public AnimationData convertJsonAnimation(JsArray<AnimationBone> bones,BVH bvh){
+		BVHNode rootNode=new BVHConverter().convertBVHNode(bones);
+		
+		//maybe same as <AnimationBone>
+		nameOrderList=new ArrayList<String>();
+		String oldName=null;
+		for(int i=0;i<bvh.getNameAndChannels().size();i++){
+			String newName=bvh.getNameAndChannels().get(i).getName();
+
+			if(!newName.equals(oldName)){
+				nameOrderList.add(newName);
+				oldName=newName;
+			}
+		}
+	//	LogUtils.log("xx1");
+		/*
+		List<Quaternion> boneQ=new ArrayList<Quaternion>();
+		for(int i=0;i<bones.length();i++){
+			boneQ.add(GWTThreeUtils.jsArrayToQuaternion(bones.get(i).getRotq()));
+		}
+		*/
+		
+		//boneMap = new HashMap<String, Matrix4>();
+		
+		
+		AnimationData data=AnimationUtils.createAnimationData();
+		parentIdMaps=new HashMap<String,Integer>();
+		jointMap=new HashMap<String,Object3D>();
+		matrixMap=new HashMap<String,Matrix4>();
+		angleMap=new HashMap<String,Vector3>();
+		for(int i=0;i<nameOrderList.size();i++){
+			//parentIdMaps.put(nameOrderList.get(i), i);
+			jointMap.put(nameOrderList.get(i), THREE.Object3D());
+		}
+		for(int i=0;i<bones.length();i++){
+			parentIdMaps.put(bones.get(i).getName(), i);
+		}
+//		LogUtils.log("2");
+		//create hierarchy
+		Map<String,AnimationHierarchyItem> hmap=new HashMap<String,AnimationHierarchyItem>();
+		
+		AnimationHierarchyItem rootItem=AnimationUtils.createAnimationHierarchyItem();
+		rootItem.setParent(-1);
+		
+		hmap.put(rootNode.getName(), rootItem);
+		convert(hmap,rootNode);
+		
+		//List<AnimationHierarchyItem> aList=new ArrayList<AnimationHierarchyItem>();
+		
+		//IdNames=new HashMap<Integer,String>();
+		//LogUtils.log("nc:"+nameOrderList.size());
+		
+		/*
+		for(int i=0;i<nameOrderList.size();i++){
+			AnimationHierarchyItem abone=hmap.get(nameOrderList.get(i));
+			data.getHierarchy().push(abone);
+			//IdNames.put(i, bvh.getNameAndChannels().get(i).getName());
+		}*/
+		//create bones order by bones
+		for(int i=0;i<bones.length();i++){
+			AnimationHierarchyItem abone=hmap.get(bones.get(i).getName());
+			data.getHierarchy().push(abone);
+			
+		}
+	//	LogUtils.log("3");
+		
+		double ft=bvh.getFrameTime();
+		data.setName("BVHMotion");
+		data.setFps(30);//TODO change
+		int minus=1;
+		if(skipFirst){
+			minus++;
+		}
+		data.setLength(ft*(bvh.getFrames()-minus));
+		//convert each frame
+		int start=0;
+		if(skipFirst){
+			start=1;
+		}
+		
+	//	LogUtils.log("4");
+		for(int i=start;i<bvh.getFrames();i++){	
+			//get each joint rotation to object3
+			doPose(bvh,bvh.getFrameAt(i));
+			
+			//create matrix for key
+			matrixMap.clear();
+			angleMap.clear();
+			//BVHNode rootNode=bvh.getHiearchy();
+			Object3D o3d=jointMap.get(rootNode.getName());
+			if(o3d==null){
+				continue;//not found
+			}
+			Matrix4 mx=THREE.Matrix4();
+			
+			Vector3 bpos=THREE.Vector3();
+					bpos.add(o3d.getPosition(),BVHUtils.toVector3(rootNode.getOffset()));
+			//LogUtils.log(rootNode.getName()+","+bpos.getX()+","+bpos.getY()+","+bpos.getZ());
+			mx.setPosition(bpos);
+			mx.setRotationFromEuler(o3d.getRotation(), "XYZ");
+			//mx.multiply(nodeToMatrix(rootNode), mx);
+			matrixMap.put(rootNode.getName(), mx);
+			angleMap.put(rootNode.getName(), GWTThreeUtils.radiantToDegree(o3d.getRotation()));
+			doMatrix(rootNode);
+		//	LogUtils.log("5");
+			for(int j=0;j<nameOrderList.size();j++){
+				AnimationHierarchyItem item=hmap.get(nameOrderList.get(j));
+				if(item==null){
+					continue;
+				}
+				//AnimationHierarchyItem item=data.getHierarchy().get(j);
+				//create Key
+				Matrix4 matrix=matrixMap.get(nameOrderList.get(j));
+				Vector3 pos=THREE.Vector3();
+				pos.setPositionFromMatrix(matrix);
+				
+				Quaternion q=THREE.Quaternion();
+				q.setFromRotationMatrix(matrix);
+				
+				//q.multiplySelf(boneQ.get(j));
+				
+				
+				AnimationKey key=AnimationUtils.createAnimationKey();
+				key.setPos(pos);//key same as bone?
+				key.setRot(GWTThreeUtils.quaternionToJsArray(q));
+				key.setAngle(angleMap.get(nameOrderList.get(j)));
+				int frame=i;
+				if(skipFirst){
+					frame--;
+				}
+				key.setTime(ft*frame);
+				item.getKeys().push(key);
+			}
+			//LogUtils.log("6");
+			
+			
+		}
+		
+		
+			//check
+			Quaternion emptyQ=THREE.Quaternion();
+			Vector3 emptyAngle=THREE.Vector3();
+			for(int j=0;j<bones.length();j++){
+				
+				AnimationHierarchyItem item=hmap.get(bones.get(j).getName());
+				int totalFrames=bvh.getFrames();
+				if(skipFirst){
+					totalFrames--;
+				}
+				if(item.getKeys().length()==0){
+					for(int i=0;i<totalFrames;i++){
+					//add empty frame
+					AnimationKey key=AnimationUtils.createAnimationKey();
+					key.setPos(GWTThreeUtils.jsArrayToVector3(bones.get(j).getPos()));
+					key.setRot(GWTThreeUtils.quaternionToJsArray(emptyQ));
+					key.setAngle(emptyAngle);
+					
+					key.setTime(ft*i);
+					item.getKeys().push(key);
+					}
+				}
+			
+		}
+		
+		return data;
 	}
 	
 	
@@ -126,6 +289,9 @@ public class AnimationDataConverter {
 			angleMap.clear();
 			//BVHNode rootNode=bvh.getHiearchy();
 			Object3D o3d=jointMap.get(rootNode.getName());
+			if(o3d==null){
+				continue;//not found
+			}
 			Matrix4 mx=THREE.Matrix4();
 			
 			Vector3 bpos=THREE.Vector3();
@@ -139,7 +305,11 @@ public class AnimationDataConverter {
 			doMatrix(rootNode);
 			
 			for(int j=0;j<nameOrderList.size();j++){
-				AnimationHierarchyItem item=data.getHierarchy().get(j);
+				AnimationHierarchyItem item=hmap.get(nameOrderList.get(j));
+				if(item==null){
+					continue;
+				}
+				//AnimationHierarchyItem item=data.getHierarchy().get(j);
 				//create Key
 				Matrix4 matrix=matrixMap.get(nameOrderList.get(j));
 				Vector3 pos=THREE.Vector3();
@@ -177,6 +347,9 @@ public class AnimationDataConverter {
 	private void doMatrix(BVHNode parent) {
 		for(BVHNode children:parent.getJoints()){
 			Object3D o3d=jointMap.get(children.getName());
+			if(o3d==null){
+				continue;//not found
+			}
 			//GWT.log(message);
 			Matrix4 mx=THREE.Matrix4();
 			Vector3 mpos=THREE.Vector3();

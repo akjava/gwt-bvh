@@ -1,4 +1,4 @@
-package com.akjava.bvh.client.threejs;
+package com.akjava.gwt.bvh.client.threejs;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,13 +9,15 @@ import com.akjava.bvh.client.BVH;
 import com.akjava.bvh.client.BVHNode;
 import com.akjava.gwt.three.client.THREE;
 import com.akjava.gwt.three.client.core.Matrix4;
-import com.akjava.gwt.three.client.core.Quaternion;
 import com.akjava.gwt.three.client.core.Vector3;
 import com.akjava.gwt.three.client.gwt.GWTThreeUtils;
 import com.akjava.gwt.three.client.gwt.animation.AnimationBone;
+import com.akjava.gwt.three.client.gwt.animation.AnimationData;
+import com.akjava.gwt.three.client.gwt.animation.AnimationKey;
 import com.akjava.gwt.three.client.gwt.animation.AnimationUtils;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayNumber;
 
 public class AnimationBoneConverter {
 
@@ -93,6 +95,39 @@ public class AnimationBoneConverter {
 			map.put(children.getName(), bone);
 			
 			convert(map,children,mx);
+		}
+	}
+	
+	
+	//Dont work
+	public static void setBoneAngles(JsArray<AnimationBone> bones,AnimationData data,int index){
+		JsArrayNumber rootPos=null;
+		for(int i=0;i<bones.length();i++){
+			
+			AnimationKey key=data.getHierarchy().get(i).getKeys().get(index);
+			
+			/*
+			if(i==0){
+				//COPY only root
+				rootPos=GWTThreeUtils.clone(key.getPos());
+				bones.get(i).setPos(rootPos);
+			}else{
+				
+				JsArrayNumber newPos=GWTThreeUtils.clone(key.getPos());
+				newPos.set(0, newPos.get(0)+rootPos.get(0));
+				newPos.set(1, newPos.get(1)+rootPos.get(1));
+				newPos.set(2, newPos.get(2)+rootPos.get(2));
+			}*/
+			
+			/*
+			Matrix4 angleM=GWTThreeUtils.degitRotationToMatrix4(THREE.Vector3(0, 0, 45));
+			Vector3 pos=GWTThreeUtils.jsArrayToVector3(key.getPos());
+			angleM.multiplyVector3(pos);
+			bones.get(i).setPos(pos);
+			*/
+			
+			//noeffect?
+			//bones.get(i).setRot(GWTThreeUtils.clone(key.getRot()));
 		}
 	}
 }
