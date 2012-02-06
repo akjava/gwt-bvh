@@ -29,10 +29,18 @@ public void setOffset(Vec3 offset) {
 	this.offset = offset;
 }
 public Vec3 getEndSite() {
-	return endSite;
+	if(endSites.size()>0){
+	return endSites.get(0);
+	}else{
+		return null;
+	}
 }
-public void setEndSite(Vec3 endSite) {
-	this.endSite = endSite;
+public List<Vec3> getEndSites() {
+	return endSites;
+}
+
+public void addEndSite(Vec3 endSite) {
+	this.endSites.add(endSite);
 }
 public String getName() {
 	return name;
@@ -46,7 +54,7 @@ public Channels getChannels() {
 public void setChannels(Channels channels) {
 	this.channels = channels;
 }
-private Vec3 endSite;
+private List<Vec3> endSites=new ArrayList<Vec3>();
 private String name;
 private Channels channels;
 private List<BVHNode> joints=new ArrayList<BVHNode>();

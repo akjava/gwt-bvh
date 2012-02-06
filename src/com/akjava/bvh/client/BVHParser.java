@@ -225,7 +225,7 @@ public class BVHParser {
 				double x=toDouble(i,line,values2[1]);
 				double y=toDouble(i,line,values2[2]);
 				double z=toDouble(i,line,values2[3]);
-				getLast().setEndSite(new Vec3(x,y,z));
+				getLast().addEndSite(new Vec3(x,y,z));
 				mode=EXPECT_ENDSITES_CLOSE;
 			}else{
 				throw new InvalidLineException(i,line, "Endsite only support offset");
@@ -246,6 +246,8 @@ public class BVHParser {
 				if(nodes.size()==0){
 					mode=EXPECT_MOTION;
 				}
+			}else if(line.equals("End Site")){
+				mode=EXPECT_ENDSITES_OPEN;
 			}else{
 				throw new InvalidLineException(i,line, "Expected {");
 			}

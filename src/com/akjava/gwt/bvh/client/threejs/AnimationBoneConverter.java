@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.akjava.bvh.client.BVH;
 import com.akjava.bvh.client.BVHNode;
+import com.akjava.bvh.client.Vec3;
 import com.akjava.gwt.three.client.THREE;
 import com.akjava.gwt.three.client.core.Matrix4;
 import com.akjava.gwt.three.client.core.Vector3;
@@ -22,6 +23,27 @@ import com.google.gwt.core.client.JsArrayNumber;
 public class AnimationBoneConverter {
 
 	private List<String> nameOrderList;
+	
+	
+	public List<List<Vector3>> convertJsonBoneEndSites(BVH bvh){
+		List<List<Vector3>> result=new ArrayList<List<Vector3>>();
+		convertJsonBoneEndSites(bvh.getHiearchy(),result);
+		return result;
+	}
+	private void convertJsonBoneEndSites(BVHNode node,List<List<Vector3>> result){
+		
+		List<Vec3> endsites=node.getEndSites();
+		List<Vector3> endVecs=new ArrayList<Vector3>();
+		for(Vec3 vec:endsites){
+			endVecs.add(THREE.Vector3(vec.getX(), vec.getY(), vec.getZ()));
+		}
+		result.add(endVecs);
+		
+		for(BVHNode childNode:node.getJoints()){
+			convertJsonBoneEndSites(childNode,result);
+		}
+		
+	}
 	
 	public JsArray<AnimationBone> convertJsonBone(BVH bvh){
 		nameOrderList=new ArrayList<String>();

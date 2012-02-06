@@ -35,7 +35,7 @@ public class BVHConverter {
 		for(BVHNode node:bvhs){
 			if(node.getJoints().size()==0){//empty has end site
 				Vec3 endSite=node.getOffset().clone();//.multiplyScalar(2);
-				node.setEndSite(endSite);
+				node.addEndSite(endSite);
 			}
 		}
 		
