@@ -22,7 +22,7 @@ import java.util.List;
 import com.akjava.gwt.lib.client.LineSplitter;
 import com.akjava.gwt.lib.client.LineSplitter.SplitterListener;
 import com.akjava.gwt.lib.client.LogUtils;
-import com.akjava.gwt.lib.client.widget.cell.util.Benchmark;
+import com.akjava.lib.common.utils.Benchmark;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 

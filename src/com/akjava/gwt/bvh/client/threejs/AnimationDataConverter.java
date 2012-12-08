@@ -160,7 +160,7 @@ public class AnimationDataConverter {
 				//create Key
 				Matrix4 matrix=matrixMap.get(nameOrderList.get(j));
 				Vector3 pos=THREE.Vector3();
-				pos.setPositionFromMatrix(matrix);
+				pos.getPositionFromMatrix(matrix);
 				
 				Quaternion q=THREE.Quaternion();
 				q.setFromRotationMatrix(matrix);
@@ -313,7 +313,7 @@ public class AnimationDataConverter {
 				//create Key
 				Matrix4 matrix=matrixMap.get(nameOrderList.get(j));
 				Vector3 pos=THREE.Vector3();
-				pos.setPositionFromMatrix(matrix);
+				pos.getPositionFromMatrix(matrix);
 				
 				Quaternion q=THREE.Quaternion();
 				q.setFromRotationMatrix(matrix);
@@ -430,6 +430,6 @@ public class AnimationDataConverter {
 		Matrix4 mx=THREE.Matrix4();
 		mx.setRotationFromEuler(vec, lastOrder);
 		
-		vec.setRotationFromMatrix(mx);
+		vec.getRotationFromMatrix(mx);
 	}
 }

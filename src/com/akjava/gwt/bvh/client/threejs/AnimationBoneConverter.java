@@ -112,7 +112,7 @@ public class AnimationBoneConverter {
 			//mx=mx.multiply(parentMx, mx);
 			
 			Vector3 mxPos=THREE.Vector3();
-			mxPos.setPositionFromMatrix(mx);
+			mxPos.getPositionFromMatrix(mx);
 			bone.setPos(mxPos);
 			map.put(children.getName(), bone);
 			

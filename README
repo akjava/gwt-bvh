@@ -6,6 +6,8 @@ now has only libbvh
 Player move to GWT BVH Motion Creator
 https://github.com/akjava/BVH-Motion-Creator
 
+this is just library
+no entry point
 
 Release
 r4 - akjavalibbvh_120214.jar
