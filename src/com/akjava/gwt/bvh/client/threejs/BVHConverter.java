@@ -7,11 +7,11 @@ import com.akjava.bvh.client.BVHNode;
 import com.akjava.bvh.client.Channels;
 import com.akjava.bvh.client.Vec3;
 import com.akjava.gwt.lib.client.LogUtils;
-import com.akjava.gwt.three.client.core.Matrix4;
-import com.akjava.gwt.three.client.core.Vector3;
 import com.akjava.gwt.three.client.gwt.GWTThreeUtils;
 import com.akjava.gwt.three.client.gwt.animation.AngleAndPosition;
 import com.akjava.gwt.three.client.gwt.animation.AnimationBone;
+import com.akjava.gwt.three.client.js.math.Matrix4;
+import com.akjava.gwt.three.client.js.math.Vector3;
 import com.google.gwt.core.client.JsArray;
 
 public class BVHConverter {

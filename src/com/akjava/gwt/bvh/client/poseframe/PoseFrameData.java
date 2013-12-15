@@ -1,14 +1,13 @@
 package com.akjava.gwt.bvh.client.poseframe;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.akjava.gwt.three.client.core.Vector3;
 import com.akjava.gwt.three.client.gwt.animation.AngleAndPosition;
 import com.akjava.gwt.three.client.gwt.animation.AnimationBonesData;
+import com.akjava.gwt.three.client.js.math.Vector3;
 
 public class PoseFrameData {
 List<AngleAndPosition> matrixs;//for current bone

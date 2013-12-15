@@ -9,20 +9,18 @@ import com.akjava.bvh.client.BVH;
 import com.akjava.bvh.client.BVHNode;
 import com.akjava.bvh.client.Channels;
 import com.akjava.bvh.client.NameAndChannel;
-import com.akjava.gwt.lib.client.LogUtils;
-import com.akjava.gwt.three.client.THREE;
-import com.akjava.gwt.three.client.core.Matrix4;
-import com.akjava.gwt.three.client.core.Object3D;
-import com.akjava.gwt.three.client.core.Quaternion;
-import com.akjava.gwt.three.client.core.Vector3;
 import com.akjava.gwt.three.client.gwt.GWTThreeUtils;
 import com.akjava.gwt.three.client.gwt.animation.AnimationBone;
 import com.akjava.gwt.three.client.gwt.animation.AnimationData;
 import com.akjava.gwt.three.client.gwt.animation.AnimationHierarchyItem;
 import com.akjava.gwt.three.client.gwt.animation.AnimationKey;
 import com.akjava.gwt.three.client.gwt.animation.AnimationUtils;
+import com.akjava.gwt.three.client.js.THREE;
+import com.akjava.gwt.three.client.js.core.Object3D;
+import com.akjava.gwt.three.client.js.math.Matrix4;
+import com.akjava.gwt.three.client.js.math.Quaternion;
+import com.akjava.gwt.three.client.js.math.Vector3;
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.client.JsArrayNumber;
 
 public class AnimationDataConverter {
 	
@@ -145,7 +143,8 @@ public class AnimationDataConverter {
 					bpos.add(o3d.getPosition(),BVHUtils.toVector3(rootNode.getOffset()));
 			//LogUtils.log(rootNode.getName()+","+bpos.getX()+","+bpos.getY()+","+bpos.getZ());
 			mx.setPosition(bpos);
-			mx.setRotationFromEuler(o3d.getRotation(), "XYZ");
+			//mx.setRotationFromEuler(o3d.getRotation(), "XYZ");
+			mx.makeRotationFromEuler(o3d.getRotation());
 			//mx.multiply(nodeToMatrix(rootNode), mx);
 			matrixMap.put(rootNode.getName(), mx);
 			angleMap.put(rootNode.getName(), GWTThreeUtils.radiantToDegree(o3d.getRotation()));
@@ -298,7 +297,7 @@ public class AnimationDataConverter {
 					bpos.add(o3d.getPosition(),BVHUtils.toVector3(rootNode.getOffset()));
 			//LogUtils.log(rootNode.getName()+","+bpos.getX()+","+bpos.getY()+","+bpos.getZ());
 			mx.setPosition(bpos);
-			mx.setRotationFromEuler(o3d.getRotation(), "XYZ");
+			mx.makeRotationFromEuler(o3d.getRotation());
 			//mx.multiply(nodeToMatrix(rootNode), mx);
 			matrixMap.put(rootNode.getName(), mx);
 			angleMap.put(rootNode.getName(), GWTThreeUtils.radiantToDegree(o3d.getRotation()));
@@ -356,7 +355,7 @@ public class AnimationDataConverter {
 			mpos.add(o3d.getPosition(), BVHUtils.toVector3(children.getOffset()));
 			//LogUtils.log("doMatrix:"+children.getName()+",o3d="+ThreeLog.get(o3d.getPosition())+",childoffset="+children.getOffset());
 			mx.setPosition(mpos);
-			mx.setRotationFromEuler(o3d.getRotation(), "XYZ");
+			mx.makeRotationFromEuler(o3d.getRotation());
 			//mx=mx.multiply(nodeToMatrix(children), mx);
 			
 			Matrix4 parentM=matrixMap.get(parent.getName());
@@ -424,12 +423,12 @@ public class AnimationDataConverter {
 		}
 		setRotation(oldTarget,lastOrder);//do last one
 	}
-	
+	/**
+	 * this is just set order
+	 * @param target
+	 * @param lastOrder
+	 */
 	private void setRotation(Object3D target,String lastOrder){
-		Vector3 vec=target.getRotation();
-		Matrix4 mx=THREE.Matrix4();
-		mx.setRotationFromEuler(vec, lastOrder);
-		
-		vec.getRotationFromMatrix(mx);
+		target.getRotation().setOrder(lastOrder);
 	}
 }

@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.Map;
 
 import com.akjava.gwt.lib.client.LogUtils;
-import com.akjava.gwt.three.client.THREE;
-import com.akjava.gwt.three.client.core.Matrix4;
-import com.akjava.gwt.three.client.core.Vector3;
 import com.akjava.gwt.three.client.gwt.GWTThreeUtils;
 import com.akjava.gwt.three.client.gwt.animation.AngleAndPosition;
 import com.akjava.gwt.three.client.gwt.animation.AnimationBonesData;
+import com.akjava.gwt.three.client.js.THREE;
+import com.akjava.gwt.three.client.js.math.Matrix4;
+import com.akjava.gwt.three.client.js.math.Vector3;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
