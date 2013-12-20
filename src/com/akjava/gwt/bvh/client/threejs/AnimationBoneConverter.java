@@ -8,11 +8,11 @@ import java.util.Map;
 import com.akjava.bvh.client.BVH;
 import com.akjava.bvh.client.BVHNode;
 import com.akjava.bvh.client.Vec3;
-import com.akjava.gwt.three.client.gwt.GWTThreeUtils;
 import com.akjava.gwt.three.client.gwt.animation.AnimationBone;
 import com.akjava.gwt.three.client.gwt.animation.AnimationData;
 import com.akjava.gwt.three.client.gwt.animation.AnimationKey;
 import com.akjava.gwt.three.client.gwt.animation.AnimationUtils;
+import com.akjava.gwt.three.client.java.utils.GWTThreeUtils;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.math.Matrix4;
 import com.akjava.gwt.three.client.js.math.Vector3;
@@ -112,7 +112,7 @@ public class AnimationBoneConverter {
 			//mx=mx.multiply(parentMx, mx);
 			
 			Vector3 mxPos=THREE.Vector3();
-			mxPos.getPositionFromMatrix(mx);
+			mxPos.setFromMatrixPosition(mx);
 			bone.setPos(mxPos);
 			map.put(children.getName(), bone);
 			

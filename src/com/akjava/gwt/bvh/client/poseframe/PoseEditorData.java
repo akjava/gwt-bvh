@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.akjava.gwt.lib.client.LogUtils;
-import com.akjava.gwt.three.client.gwt.GWTThreeUtils;
 import com.akjava.gwt.three.client.gwt.animation.AngleAndPosition;
 import com.akjava.gwt.three.client.gwt.animation.AnimationBonesData;
+import com.akjava.gwt.three.client.java.utils.GWTThreeUtils;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.math.Matrix4;
 import com.akjava.gwt.three.client.js.math.Vector3;
@@ -98,10 +98,9 @@ public void updateMatrix(AnimationBonesData abData){
 				LogUtils.log("not-has:"+bones.get(i));
 			}
 			
-			Matrix4 mx=THREE.Matrix4();
+			Vector3 vector=GWTThreeUtils.degreeToRagiant(anglePos);
+			Matrix4 mx=THREE.Matrix4().makeRotationFromEuler(THREE.Euler(vector.getX(),vector.getY(),vector.getZ(), "XYZ"));
 			mx.setPosition(posRef);
-		//	LogUtils.log(bones.get(i)+":"+ThreeLog.get(posRef));
-			mx.setRotationFromEuler(GWTThreeUtils.degreeToRagiant(anglePos), "XYZ");
 			AngleAndPosition ap=new AngleAndPosition(anglePos, posRef, mx);
 			
 			
@@ -196,7 +195,7 @@ private static JSONArray toJSONArray(Vector3 vec){
 }
 //TODO check
 public static PoseEditorData readData(String jsonString){
-	JSONValue value=JSONParser.parseLenient(jsonString);
+	JSONValue value=JSONParser.parseStrict(jsonString);
 	
 	//LogUtils.log(value.toString());
 	

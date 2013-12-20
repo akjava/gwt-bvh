@@ -9,12 +9,12 @@ import com.akjava.bvh.client.BVH;
 import com.akjava.bvh.client.BVHNode;
 import com.akjava.bvh.client.Channels;
 import com.akjava.bvh.client.NameAndChannel;
-import com.akjava.gwt.three.client.gwt.GWTThreeUtils;
 import com.akjava.gwt.three.client.gwt.animation.AnimationBone;
 import com.akjava.gwt.three.client.gwt.animation.AnimationData;
 import com.akjava.gwt.three.client.gwt.animation.AnimationHierarchyItem;
 import com.akjava.gwt.three.client.gwt.animation.AnimationKey;
 import com.akjava.gwt.three.client.gwt.animation.AnimationUtils;
+import com.akjava.gwt.three.client.java.utils.GWTThreeUtils;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.Object3D;
 import com.akjava.gwt.three.client.js.math.Matrix4;
@@ -140,7 +140,7 @@ public class AnimationDataConverter {
 			Matrix4 mx=THREE.Matrix4();
 			
 			Vector3 bpos=THREE.Vector3();
-					bpos.add(o3d.getPosition(),BVHUtils.toVector3(rootNode.getOffset()));
+					bpos.addVectors(o3d.getPosition(),BVHUtils.toVector3(rootNode.getOffset()));
 			//LogUtils.log(rootNode.getName()+","+bpos.getX()+","+bpos.getY()+","+bpos.getZ());
 			
 			//mx.setRotationFromEuler(o3d.getRotation(), "XYZ");
@@ -160,7 +160,7 @@ public class AnimationDataConverter {
 				//create Key
 				Matrix4 matrix=matrixMap.get(nameOrderList.get(j));
 				Vector3 pos=THREE.Vector3();
-				pos.getPositionFromMatrix(matrix);
+				pos.setFromMatrixPosition(matrix);
 				
 				Quaternion q=THREE.Quaternion();
 				q.setFromRotationMatrix(matrix);
@@ -295,7 +295,7 @@ public class AnimationDataConverter {
 			Matrix4 mx=THREE.Matrix4();
 			
 			Vector3 bpos=THREE.Vector3();
-					bpos.add(o3d.getPosition(),BVHUtils.toVector3(rootNode.getOffset()));
+					bpos.addVectors(o3d.getPosition(),BVHUtils.toVector3(rootNode.getOffset()));
 			//LogUtils.log(rootNode.getName()+","+bpos.getX()+","+bpos.getY()+","+bpos.getZ());
 			
 			mx.makeRotationFromEuler(o3d.getRotation());
@@ -315,7 +315,7 @@ public class AnimationDataConverter {
 				//create Key
 				Matrix4 matrix=matrixMap.get(nameOrderList.get(j));
 				Vector3 pos=THREE.Vector3();
-				pos.getPositionFromMatrix(matrix);
+				pos.setFromMatrixPosition(matrix);
 				
 				Quaternion q=THREE.Quaternion();
 				q.setFromRotationMatrix(matrix);
@@ -355,7 +355,7 @@ public class AnimationDataConverter {
 			//GWT.log(message);
 			Matrix4 mx=THREE.Matrix4();
 			Vector3 mpos=THREE.Vector3();
-			mpos.add(o3d.getPosition(), BVHUtils.toVector3(children.getOffset()));
+			mpos.addVectors(o3d.getPosition(), BVHUtils.toVector3(children.getOffset()));
 			//LogUtils.log("doMatrix:"+children.getName()+",o3d="+ThreeLog.get(o3d.getPosition())+",childoffset="+children.getOffset());
 			
 			mx.makeRotationFromEuler(o3d.getRotation());
