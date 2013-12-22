@@ -13,7 +13,7 @@ import com.akjava.gwt.three.client.gwt.animation.AnimationBone;
 import com.akjava.gwt.three.client.gwt.animation.AnimationData;
 import com.akjava.gwt.three.client.gwt.animation.AnimationHierarchyItem;
 import com.akjava.gwt.three.client.gwt.animation.AnimationKey;
-import com.akjava.gwt.three.client.gwt.animation.AnimationUtils;
+import com.akjava.gwt.three.client.java.utils.AnimationUtils;
 import com.akjava.gwt.three.client.java.utils.GWTThreeUtils;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.core.Object3D;

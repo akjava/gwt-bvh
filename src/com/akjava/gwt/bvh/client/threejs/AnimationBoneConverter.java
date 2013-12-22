@@ -11,7 +11,7 @@ import com.akjava.bvh.client.Vec3;
 import com.akjava.gwt.three.client.gwt.animation.AnimationBone;
 import com.akjava.gwt.three.client.gwt.animation.AnimationData;
 import com.akjava.gwt.three.client.gwt.animation.AnimationKey;
-import com.akjava.gwt.three.client.gwt.animation.AnimationUtils;
+import com.akjava.gwt.three.client.java.utils.AnimationUtils;
 import com.akjava.gwt.three.client.java.utils.GWTThreeUtils;
 import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.math.Matrix4;
