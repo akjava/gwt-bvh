@@ -136,7 +136,7 @@ public class BVHParser {
 			}
 			break;
 		case EXPECT_JOINT_INSIDE:
-			String[] values=line.split(" ");
+			String[] values=line.split("\\s+");
 			if(values[0].equals("OFFSET")){
 				if(values.length!=4){
 					throw new InvalidLineException(i,line, "OFFSET value need 3 points");
@@ -217,7 +217,7 @@ public class BVHParser {
 			}
 			break;
 		case EXPECT_ENDSITES_INSIDE:
-			String[] values2=line.split(" ");
+			String[] values2=line.split("\\s+");
 			if(values2[0].equals("OFFSET")){
 				if(values2.length!=4){
 					throw new InvalidLineException(i,line, "OFFSET value need 3 points");
@@ -262,7 +262,7 @@ public class BVHParser {
 			}
 			break;
 		case EXPECT_MOTION_FRAMES:
-			String[] mv=line.split(" ");
+			String[] mv=line.split("\\s+");
 			if(mv[0].equals("Frames:")&& mv.length==2){
 				int frames=toInt(i, line, mv[1]);
 				bvh.getMotion().setFrames(frames);
@@ -306,7 +306,7 @@ public class BVHParser {
 		return vs;
 	}
 	protected  double[] toDouble(int index,String line) throws InvalidLineException{
-		String values[]=line.split(" ");
+		String values[]=line.split("\\s+");
 		double vs[]=new double[values.length];
 		try{
 		for(int i=0;i<values.length;i++){
