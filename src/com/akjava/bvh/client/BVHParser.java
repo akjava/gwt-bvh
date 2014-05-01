@@ -52,7 +52,7 @@ public class BVHParser {
 		public void onSuccess(BVH bvh);
 		public void onFaild(String message);
 	}
-	
+	//for long text
 	public  void parseAsync(String text,final ParserListener listener){
 		initialize();
 		final String replaced=text.replace("\r", "");

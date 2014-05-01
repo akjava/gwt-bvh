@@ -88,6 +88,10 @@ public void updateMatrix(AnimationBonesData abData){
 			Vector3 anglePos=fdata.getAngles().get(i).clone();
 			Vector3 posRef=fdata.getPositions().get(i).clone();
 			
+			if(i>=bones.size()){
+				LogUtils.log("invalid pose for bone");
+				return;
+			}
 			
 			int index=abData.getBoneIndex(bones.get(i));
 			if(index!=-1){//has bone

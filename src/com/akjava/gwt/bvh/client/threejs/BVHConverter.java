@@ -1,10 +1,14 @@
 package com.akjava.gwt.bvh.client.threejs;
 
+import java.nio.channels.Channel;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.akjava.bvh.client.BVH;
+import com.akjava.bvh.client.BVHMotion;
 import com.akjava.bvh.client.BVHNode;
 import com.akjava.bvh.client.Channels;
+import com.akjava.bvh.client.NameAndChannel;
 import com.akjava.bvh.client.Vec3;
 import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.gwt.animation.AngleAndPosition;
@@ -21,9 +25,12 @@ public class BVHConverter {
 		for(int i=0;i<bones.length();i++){
 			AnimationBone bone=bones.get(i);
 			BVHNode node=boneToBVHNode(bone);
+			
+			/*
 			if(i==0){
-				node.setOffset(new Vec3(0,0,0));//i think it's better
+				node.setOffset(new Vec3(0,0,0));//i think it's better,i change mind, need this one
 			}
+			*/
 			bvhs.add(node);
 			//add parent
 			if(bone.getParent()!=-1){
@@ -41,6 +48,67 @@ public class BVHConverter {
 		
 		return bvhs.get(0);
 	}
+	
+	public BVH createBVH(JsArray<AnimationBone> bones){
+		BVHConverter converter=new BVHConverter();
+		
+		BVHNode rootNode=converter.convertBVHNode(bones);
+
+		converter.setChannels(rootNode,0,"XYZ");	//TODO support other order
+		BVH bvh=new BVH();
+		bvh.setHiearchy(rootNode);
+		
+		BVHMotion motion=new BVHMotion();
+		motion.setFrameTime(.25);
+				
+		createChannels(bvh,rootNode);
+
+		//create initial zero motion
+		motion.add(new double[bvh.getNameAndChannels().size()]);//only root has pos,TODO find better way
+		motion.setFrames(motion.getMotions().size());//
+		
+		bvh.setMotion(motion);
+		
+		return bvh;
+	}
+	
+	private void createChannels(BVH bvh,BVHNode node){
+		
+		if(node.getChannels().isXposition()){
+			
+			
+			bvh.add(new NameAndChannel(node.getName(), Channels.XPOSITION,node.getChannels()));
+		}
+		if(node.getChannels().isYposition()){
+			
+			
+			bvh.add(new NameAndChannel(node.getName(), Channels.YPOSITION,node.getChannels()));
+		}
+		
+		if(node.getChannels().isZposition()){
+		
+			bvh.add(new NameAndChannel(node.getName(), Channels.ZPOSITION,node.getChannels()));
+		}
+		
+		if(node.getChannels().isXrotation()){
+			
+			bvh.add(new NameAndChannel(node.getName(), Channels.XROTATION,node.getChannels()));
+		}
+		if(node.getChannels().isYrotation()){
+		
+			bvh.add(new NameAndChannel(node.getName(), Channels.YROTATION,node.getChannels()));
+		}
+		
+		if(node.getChannels().isZrotation()){
+			
+			bvh.add(new NameAndChannel(node.getName(), Channels.ZROTATION,node.getChannels()));
+		}
+	
+		for(BVHNode joint:node.getJoints()){
+			createChannels(bvh, joint);
+		}
+	}
+	
 	
 public double[] angleAndMatrixsToMotion(List<AngleAndPosition> matrixs,int mode,String order){
 		
