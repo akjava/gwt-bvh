@@ -169,6 +169,7 @@ public static JSONObject writeData(PoseEditorData data){
 		 
 		
 		//positions
+		/*//no more need ik value
 		Map<String,Vector3> ikpositions=fdata.getIkTargetPositionMap();
 		JSONArray ikpositionsValue=new JSONArray();
 		int index=0;
@@ -182,6 +183,8 @@ public static JSONObject writeData(PoseEditorData data){
 				index++;
 			}
 			frameValue.put("ik-positions", ikpositionsValue);
+			*/
+		
 		//LogUtils.log("ik-positions");
 		frames.set(i, frameValue);
 	}
@@ -293,13 +296,14 @@ public static PoseEditorData readData(String jsonString){
 			frameData.setIkTargetNames(nameList);
 			*/
 		
-			
+			/*
 			Map<String,Vector3> ikPositions=readIkPositions(jsn.get("ik-positions"));//old format
 			if(ikPositions==null){
 				LogUtils.log("invalid-frames-ikPositions:"+i);
 				return null;
 			}
 			frameData.setIkTargetPositionMap(ikPositions);
+			*/
 			
 		}else{
 			LogUtils.log("invalid-frames:"+i);
@@ -398,6 +402,12 @@ private static  List<Vector3> readPositions(JSONValue value){
 }
 	
 private static String[] oldIkNames={"LowerBack-Neck1","RightArm-RightForeArm","RightUpLeg-RightLeg","LeftArm-LeftForeArm","LeftUpLeg-LeftLeg"};
+
+/**
+ * @deprecated no more ik use
+ * @param value
+ * @return
+ */
 private static  Map<String,Vector3> readIkPositions(JSONValue value){
 	if(value==null){
 		return null;

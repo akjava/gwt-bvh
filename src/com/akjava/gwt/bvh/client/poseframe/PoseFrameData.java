@@ -40,16 +40,43 @@ public void setAngleAndMatrixs(List<AngleAndPosition> matrixs) {
 }
 private Map<String,Vector3> ikTargetPositionMap=new LinkedHashMap<String,Vector3>();
 
+
+
+/**
+ * stop store ik pos anymore because usually on select initilize ikpos
+ * @deprecated
+ * @param name
+ * @param pos
+ */
 public Map<String, Vector3> getIkTargetPositionMap() {
 	return ikTargetPositionMap;
 }
+
+
+/**
+ * @deprecated
+ * @param name
+ * @param pos
+ */
 public void setIkTargetPositionMap(Map<String, Vector3> ikTargetPositionMap) {
 	this.ikTargetPositionMap = ikTargetPositionMap;
 }
+
+
+/**
+ * @deprecated
+ * @param name
+ * @param pos
+ */
 public Vector3 getIkTargetPosition(String name){
 	return ikTargetPositionMap.get(name);
 }
 
+/**
+ * @deprecated
+ * @param name
+ * @param pos
+ */
 public void setIkTargetPosition(String name,Vector3 pos){
 	 ikTargetPositionMap.put(name,pos);
 }
