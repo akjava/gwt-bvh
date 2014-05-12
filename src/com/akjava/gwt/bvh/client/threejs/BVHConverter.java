@@ -1,6 +1,5 @@
 package com.akjava.gwt.bvh.client.threejs;
 
-import java.nio.channels.Channel;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,9 +13,12 @@ import com.akjava.gwt.lib.client.LogUtils;
 import com.akjava.gwt.three.client.gwt.animation.AngleAndPosition;
 import com.akjava.gwt.three.client.gwt.animation.AnimationBone;
 import com.akjava.gwt.three.client.java.utils.GWTThreeUtils;
+import com.akjava.gwt.three.client.js.THREE;
 import com.akjava.gwt.three.client.js.math.Matrix4;
+import com.akjava.gwt.three.client.js.math.Quaternion;
 import com.akjava.gwt.three.client.js.math.Vector3;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.core.client.JsArrayNumber;
 
 public class BVHConverter {
 	public BVHNode convertBVHNode(JsArray<AnimationBone> bones){
@@ -24,7 +26,17 @@ public class BVHConverter {
 		
 		for(int i=0;i<bones.length();i++){
 			AnimationBone bone=bones.get(i);
-			BVHNode node=boneToBVHNode(bone);
+			
+			BVHNode node=null;
+			if(bone.getParent()!=-1){
+				
+				node=boneToBVHNode(bone,bones);//try has rotq
+				//node=boneToBVHNode(bone);
+			}else{
+				node=boneToBVHNode(bone);
+			}
+			
+			//BVHNode node=boneToBVHNode(bone);
 			
 			/*
 			if(i==0){
@@ -189,15 +201,66 @@ public double[] angleAndMatrixsToMotion(List<AngleAndPosition> matrixs,int mode,
 	}
 	
 	
+	private BVHNode boneToBVHNode(AnimationBone bone,JsArray<AnimationBone> bones){
+		BVHNode bvhNode=new BVHNode();
+		bvhNode.setName(bone.getName());
+		
+		
+		Quaternion q=THREE.Quaternion();
+		AnimationBone parent=bones.get(bone.getParent());
+		
+		List<Integer> parents=new ArrayList<Integer>();
+		parents.add(bone.getParent());
+		
+		
+		while(parent.getParent()!=-1){
+			parents.add(parent.getParent());
+			parent=bones.get(parent.getParent());
+		}
+		
+		//order is very important
+		for(int i=parents.size()-1;i>=0;i--){
+			int v=parents.get(i);
+			q.multiply(THREE.Quaternion().fromArray(bones.get(v).getRotq()));
+		}
+		
+		
+		Vector3 v=THREE.Vector3().fromArray(bone.getPos());
+		
+		v.applyQuaternion(q);
+		
+		
+		
+		Vec3 pos=new Vec3(v.getX(),v.getY(),v.getZ());
+		
+		//Vec3 pos=new Vec3(bone.getPos().get(0),bone.getPos().get(1),bone.getPos().get(2));
+		bvhNode.setOffset(pos);
+		
+		//no channels
+		return bvhNode;
+	}
+	
+	
 	private BVHNode boneToBVHNode(AnimationBone bone){
 		BVHNode bvhNode=new BVHNode();
 		bvhNode.setName(bone.getName());
-		Vec3 pos=new Vec3(bone.getPos().get(0),bone.getPos().get(1),bone.getPos().get(2));
-		bvhNode.setOffset(pos);
 		
-		/*
-		 * maybe igreno angle is better?
-		 */
+		
+		//TODO support rotQ
+		
+		//Matrix4 m4=THREE.Matrix4().makeRotationFromQuaternion(THREE.Quaternion().fromArray(bone.getRotq()));
+		
+		//Quaternion q=THREE.Quaternion().fromArray(bone.getRotq());
+		Vector3 v=THREE.Vector3().fromArray(bone.getPos());
+		
+		//v.applyQuaternion(q);
+		
+		
+		
+		Vec3 pos=new Vec3(v.getX(),v.getY(),v.getZ());
+		
+		//Vec3 pos=new Vec3(bone.getPos().get(0),bone.getPos().get(1),bone.getPos().get(2));
+		bvhNode.setOffset(pos);
 		
 		//no channels
 		return bvhNode;
