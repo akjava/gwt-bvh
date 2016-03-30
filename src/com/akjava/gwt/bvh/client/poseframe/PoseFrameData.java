@@ -5,8 +5,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.akjava.gwt.three.client.gwt.animation.AngleAndPosition;
-import com.akjava.gwt.three.client.gwt.animation.AnimationBonesData;
+import com.akjava.gwt.three.client.gwt.boneanimation.AngleAndPosition;
+import com.akjava.gwt.three.client.gwt.boneanimation.AnimationBonesData;
 import com.akjava.gwt.three.client.js.math.Vector3;
 
 public class PoseFrameData {
