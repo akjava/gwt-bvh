@@ -114,7 +114,7 @@ public void updateMatrix(AnimationBonesData abData){
 	}
 }
 
-public static JSONObject writeData(PoseEditorData data){
+public static JSONObject convertToJson(PoseEditorData data){
 	JSONObject poseData=new JSONObject();
 	
 	//name
