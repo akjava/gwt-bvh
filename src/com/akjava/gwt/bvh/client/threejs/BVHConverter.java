@@ -144,7 +144,7 @@ public double[] angleAndMatrixsToMotion(List<AngleAndPosition> matrixs,int mode,
 			values.add(rotDegree.getY());
 			values.add(rotDegree.getZ());
 			*/
-			Vector3 angle=matrixs.get(i).getAngle();
+			Vector3 angle=matrixs.get(i).getDegreeAngle();
 			values.add(angle.getX());
 			values.add(angle.getY());
 			values.add(angle.getZ());
